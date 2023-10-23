@@ -2,7 +2,7 @@
   "name": "app",
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
-  "main": "app.mjs",
+  "main": "app.js",
   "repository": "https://github.com/jaustinhughesgit/aws-api",
   "author": "SAM CLI",
   "license": "MIT",
