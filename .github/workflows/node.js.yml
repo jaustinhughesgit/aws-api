@@ -31,4 +31,4 @@ jobs:
         aws-region: us-east-1
     - run: cd app && npm ci
     - run: zip -r publish.zip ./app/*
-    - run: aws lambda update-function-code --function-name:aws-api-AwsApiFunction-qHfABkOiUeq0 --zip-file=fileb://publish.zip
+    - run: aws lambda update-function-code --function-name=aws-api-AwsApiFunction-qHfABkOiUeq0 --zip-file=fileb://publish.zip
