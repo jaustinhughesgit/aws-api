@@ -1,9 +1,9 @@
 {
-  "name": "hello_world",
+  "name": "app",
   "version": "1.0.0",
-  "description": "AWS-API sample for NodeJS",
-  "main": "app.mjs",
-  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "description": "hello world sample for NodeJS",
+  "main": "app.js",
+  "repository": "https://github.com/jaustinhughesgit/aws-api",
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
