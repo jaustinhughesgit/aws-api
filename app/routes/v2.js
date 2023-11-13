@@ -14,7 +14,7 @@ router.get('/', async function(req, res, next) {
         console.log("b")
         if (cookies) {
             console.log("c")
-            cookies.forEach(cookie => {
+            await cookies.forEach(cookie => {
                 console.log(cookie)
                 res.setHeader('Set-Cookie', cookie);
             });
