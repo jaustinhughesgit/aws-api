@@ -1,10 +1,26 @@
 var express = require('express');
 var router = express.Router();
+const axios = require('axios');
 
-router.get('/', async function(req, res, next){
-    res.render('v2', {title:'v2'})
+router.get('/', async function(req, res, next) {
+    try {
+        // Replace this URL with the actual URL of compute.1var.com
+        const computeUrl = 'https://compute.1var.com/cookies';
+        const response = await axios.get(computeUrl, { withCredentials: true });
+
+        // Forward the cookies received from compute.1var.com to the user
+        const cookies = response.headers['set-cookie'];
+        if (cookies) {
+            cookies.forEach(cookie => {
+                res.setHeader('Set-Cookie', cookie);
+            });
+        }
+
+        res.render('v2', { title: 'v2' });
+    } catch (error) {
+        console.error('Error calling compute.1var.com:', error);
+        res.status(500).send('Server Error');
+    }
 });
-
-// Example Environment Variable: process.env.DB_CLUSTER_CONN_STR
 
 module.exports = router;
