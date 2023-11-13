@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-module.exports = (dynamodb, dynamodbLL, uuidv4) => {
+router.get('/', async function(req, res, next){
+    res.render('v`', {})
+});
 
-    router.get('/', function(req, res, next){
-        res.render('v1', {})
-    });
+// Example Environment Variable: process.env.DB_CLUSTER_CONN_STR
 
-return router;
-};
+module.exports = router;
