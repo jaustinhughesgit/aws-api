@@ -4,7 +4,7 @@ const axios = require('axios');
 
 router.get('/', async function(req, res, next) {
     try {
-        res.header('Access-Control-Allow-Origin', 'http://1var.com'); // Replace with your client's URL
+        res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
 
         const computeUrl = 'https://compute.1var.com/cookies';
