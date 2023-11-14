@@ -7,7 +7,8 @@ router.get('/', async function(req, res, next) {
         res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
 
-        const computeUrl = 'https://compute.1var.com/cookies';
+        const type = req.type; // Get the type from the request
+        const computeUrl = `https://compute.1var.com/${type}`;
         const response = await axios.get(computeUrl, { withCredentials: true });
 
         const cookies = response.headers['set-cookie'];
