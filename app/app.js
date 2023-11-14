@@ -10,8 +10,14 @@ app.set('view engine', 'ejs');
 var indexRouter = require('./routes/index');
 var v2Router = require('./routes/v2');
 app.use('/', indexRouter);
-app.use('/:type(cookies|url)/*', function(req, res, next) {
+// Route for /cookies/* and /url/*
+app.use('/:type(cookies|url)', function(req, res, next) {
     req.type = req.params.type; // Capture the type (cookies or url)
-    next();
+    next('route'); // Pass control to the next route
 }, v2Router);
+
+// Fallback route for other paths
+app.get('*', (req, res) => {
+    res.status(404).send('Page not found');
+});
 module.exports.handler = serverless(app);
