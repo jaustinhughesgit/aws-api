@@ -11,14 +11,18 @@ router.get('/', async function(req, res, next) {
         console.log("type",type)
         const response = await axios.get(computeUrl, { withCredentials: true });
 
-        const cookies = response.headers['set-cookie'];
-        if (cookies) {
-            cookies.forEach(cookie => {
-                res.append('Set-Cookie', cookie);
-            });
-        }
+        if (type == "url"){
+            res.render(response);
+        } else {
+            const cookies = response.headers['set-cookie'];
+            if (cookies) {
+                cookies.forEach(cookie => {
+                    res.append('Set-Cookie', cookie);
+                });
+            }
+            res.render('v2', { title: 'v2.3' });
+        }   
 
-        res.render('v2', { title: 'v2.3' });
     } catch (error) {
         console.error('Error calling compute.1var.com:', error);
         res.status(500).send('Server Error');
