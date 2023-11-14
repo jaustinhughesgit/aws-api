@@ -21,7 +21,7 @@ router.get('/', async function(req, res, next) {
                     res.append('Set-Cookie', cookie);
                 });
             }
-            res.render('v2', { title: 'v2.3' });
+            res.render('v2', { status: 'success' });
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
