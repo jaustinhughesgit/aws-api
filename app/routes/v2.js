@@ -22,7 +22,7 @@ router.get('/', async function(req, res, next) {
                 });
             }
             console.log("SUCCESS SUCCESS SUCCESS")
-            res.render('v2', { status: 'success' });
+            res.send('success');
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
