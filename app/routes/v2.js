@@ -9,6 +9,7 @@ router.get('/', async function(req, res, next) {
         res.header('Access-Control-Allow-Credentials', 'true');
         console.log("vsRouter3")
         const type = req.type; 
+        console.log("req.path ==> ",req.path)
         const computeUrl = `https://compute.1var.com/${type}`;
         const response = await axios.get(computeUrl, { withCredentials: true });
         if (type === "url") {
