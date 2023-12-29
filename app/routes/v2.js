@@ -25,7 +25,7 @@ router.get('/', async function(req, res, next) {
                 });
             }
             console.log("SUCCESS SUCCESS SUCCESS")
-            res.send(JSON.stringify(response));
+            res.send(response);
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
