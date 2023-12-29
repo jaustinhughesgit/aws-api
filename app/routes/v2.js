@@ -4,6 +4,8 @@ const axios = require('axios');
 console.log("vsRouter1")
 router.get('/', async function(req, res, next) {
     console.log("vsRouter2")
+    const originalHost = event.headers['X-Forwarded-Host'] || event.headers['x-forwarded-host'];
+    console.log("originalHost",originalHost)
     try {
         res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
