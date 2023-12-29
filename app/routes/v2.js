@@ -5,7 +5,7 @@ console.log("vsRouter1")
 router.get('/', async function(req, res, next) {
     console.log("vsRouter2")
     try {
-        res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
+        res.header('Access-Control-Allow-Origin', '*'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
         console.log("vsRouter3")
         const type = req.type; // Get the type from the request
