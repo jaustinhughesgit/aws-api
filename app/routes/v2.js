@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-
+console.log("vsRouter1")
 router.get('/', async function(req, res, next) {
+    console.log("vsRouter2")
     try {
         res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
+        console.log("vsRouter3")
         const type = req.type; // Get the type from the request
         const computeUrl = `https://compute.1var.com/${type}`;
         console.log("type", type);
@@ -14,7 +16,9 @@ router.get('/', async function(req, res, next) {
         if (type === "url") {
             // Assuming the response from computeUrl is the data you want to send as JSON
             res.json(response.data);
+            //WE'LL NEED TO INCORPORATE 1VAR JSON DATA INTO THE RESPONSE HERE AS WELL.
         } else if (type === "cookies") {
+            console.log("set cookies")
             const cookies = response.headers['set-cookie'];
             if (cookies) {
                 cookies.forEach(cookie => {
@@ -22,7 +26,7 @@ router.get('/', async function(req, res, next) {
                 });
             }
             console.log("SUCCESS SUCCESS SUCCESS")
-            res.send('success');
+            res.json(response);
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
