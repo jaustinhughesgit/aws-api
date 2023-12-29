@@ -12,8 +12,10 @@ var v2Router = require('./routes/v2');
 app.use('/', indexRouter);
 // Route for /cookies/* and /url/*
 app.use('/:type(cookies|url)', function(req, res, next) {
-    console.log("req",req)
-    console.log("stringify", JSON.stringify(req))
+    console.log("req",req.apiGateway.event)
+    console.log("headers",req.apiGateway.event.headers)
+    console.log("pathParameters",req.apiGateway.event.pathParameters)
+    console.log("requestContext",req.apiGateway.event.requestContext)
     req.type = req.params.type; // Capture the type (cookies or url)
     next('route'); // Pass control to the next route
 }, v2Router);
