@@ -12,9 +12,8 @@ var v2Router = require('./routes/v2');
 app.use('/', indexRouter);
 // Route for /cookies/* and /url/*
 app.use('/:type(cookies|url)', function(req, res, next) {
-
-    const originalHost = req.headers['x-forwarded-host'];
-    console.log("originalHost2",originalHost)
+    console.log("req",req)
+    console.log("stringify", json.stringify(req))
     req.type = req.params.type; // Capture the type (cookies or url)
     next('route'); // Pass control to the next route
 }, v2Router);
