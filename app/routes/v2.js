@@ -16,7 +16,6 @@ router.get('/', async function(req, res, next) {
         if (type === "url") {
             // Assuming the response from computeUrl is the data you want to send as JSON
             res.json(response.data);
-            //WE'LL NEED TO INCORPORATE 1VAR JSON DATA INTO THE RESPONSE HERE AS WELL.
         } else if (type === "cookies") {
             console.log("set cookies")
             const cookies = response.headers['set-cookie'];
@@ -26,7 +25,7 @@ router.get('/', async function(req, res, next) {
                 });
             }
             console.log("SUCCESS SUCCESS SUCCESS")
-            res.json(response);
+            res.send(response);
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
