@@ -4,6 +4,7 @@ const axios = require('axios');
 console.log("vsRouter1")
 router.get('/*', async function(req, res, next) {
     console.log("vsRouter2")
+    console.log("req",req)
     try {
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
