@@ -4,12 +4,12 @@ const axios = require('axios');
 console.log("vsRouter1")
 router.get('/', async function(req, res, next) {
     console.log("vsRouter2")
-    const originalHost = req.headers['x-forwarded-host'];
-    console.log("originalHost",originalHost)
     try {
         res.header('Access-Control-Allow-Origin', 'https://1var.com'); // Replace with your client's URL
         res.header('Access-Control-Allow-Credentials', 'true');
         console.log("vsRouter3")
+        const originalHost = req.headers['x-forwarded-host'];
+        console.log("originalHost",originalHost)
         const type = req.type; // Get the type from the request
         const computeUrl = `https://compute.1var.com/${type}`;
         console.log("type", type);
