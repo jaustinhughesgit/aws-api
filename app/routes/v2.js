@@ -12,8 +12,6 @@ router.get('/', async function(req, res, next) {
         const computeUrl = `https://compute.1var.com/${type}`;
         console.log("type", type);
         const response = await axios.get(computeUrl, { withCredentials: true });
-        console.log("==>",response)
-        let flatten = JSON.parse(JSON.stringify(response));
         if (type === "url") {
             // Assuming the response from computeUrl is the data you want to send as JSON
             res.json(response.data);
@@ -26,7 +24,7 @@ router.get('/', async function(req, res, next) {
                 });
             }
             console.log("SUCCESS SUCCESS SUCCESS")
-            res.send(flatten);
+            res.send(response.data);
         } else {
             // Handle unexpected type
             res.status(400).send('Invalid type');
