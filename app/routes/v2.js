@@ -13,7 +13,7 @@ router.get('/*', async function(req, res, next) {
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         const computeUrl = `https://compute.1var.com${reqPath}`;
-        const response = await axios.get(computeUrl, { withCredentials: true });
+        const response = await axios.post(computeUrl, { withCredentials: true });
         if (type === "url") {
             res.json(response.data);
         } else if (type === "cookies") {
