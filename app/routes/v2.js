@@ -10,6 +10,7 @@ router.all('/*', async function(req, res, next) {
         res.header('Access-Control-Allow-Credentials', 'true');
         console.log("vsRouter3")
         const type = req.type; 
+        console.log("type", type)
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         const computeUrl = `https://compute.1var.com${reqPath}`;
@@ -18,7 +19,7 @@ router.all('/*', async function(req, res, next) {
         const data = {
             text: longText
         };
-
+        console.log("computeUrl", computeUrl)
         const response = await axios.get(computeUrl, { 
             credentials: 'include'
         });
@@ -32,6 +33,7 @@ router.all('/*', async function(req, res, next) {
                     res.append('Set-Cookie', cookie);
                 });
             }
+            console.log("response",response)
             res.send(response.data);
         } else {
             res.status(400).send('Invalid type');
