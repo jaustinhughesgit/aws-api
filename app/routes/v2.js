@@ -20,8 +20,7 @@ router.get('/*', async function(req, res, next) {
         };
 
         const response = await axios.post(computeUrl, { 
-            credentials: 'include',
-            body: JSON.stringify(data)
+            credentials: 'include'
         });
         if (type === "url") {
             res.json(response.data);
