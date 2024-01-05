@@ -21,31 +21,33 @@ router.all('/*', async function(req, res, next) {
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
         if (req.method === 'GET' || req.method === 'POST') {
-        const computeUrl = `https://compute.1var.com${reqPath}`;
-        const response = await axios.post(computeUrl, { 
-            withCredentials: true,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Original-Host': originalHost
-            },
-            body: requestBody
-        });
-        if (type === "url") {
-            res.json(response.data);
-        } else if (type === "cookies") {
-            console.log("set cookies")
-            const cookies = response.headers['set-cookie'];
-            if (cookies) {
-                cookies.forEach(cookie => {
-                    res.append('Set-Cookie', cookie);
-                });
+            const computeUrl = `https://compute.1var.com${reqPath}`;
+            const response = await axios.post(computeUrl, { 
+                withCredentials: true,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Original-Host': originalHost
+                },
+                body: requestBody
+            });
+            if (type === "url") {
+                res.json(response.data);
+            } else if (type === "cookies") {
+                console.log("set cookies")
+                const cookies = response.headers['set-cookie'];
+                if (cookies) {
+                    cookies.forEach(cookie => {
+                        res.append('Set-Cookie', cookie);
+                    });
+                }
+                res.send(response.data);
+            } else {
+                res.status(400).send('Invalid type');
             }
-            res.send(response.data);
         } else {
-            res.status(400).send('Invalid type');
+            res.send("")
         }
-    }
 
     } catch (error) {
         console.error('Error calling compute.1var.com:', error);
