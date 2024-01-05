@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 console.log("vsRouter1")
 router.use(bodyParser.json());
 router.all('/*', async function(req, res, next) {
+
     console.log("vsRouter2")
     console.log("req",req)
     try {
@@ -19,10 +20,16 @@ router.all('/*', async function(req, res, next) {
         const requestBody = req.body;
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
+        if (req.method === 'GET' || req.method === 'POST') {
         const computeUrl = `https://compute.1var.com${reqPath}`;
-        const response = await axios.get(computeUrl, { 
-            withCredentials: true
-            
+        const response = await axios.post(computeUrl, { 
+            withCredentials: true,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Original-Host': originalHost
+            },
+            body: requestBody
         });
         if (type === "url") {
             res.json(response.data);
@@ -38,6 +45,7 @@ router.all('/*', async function(req, res, next) {
         } else {
             res.status(400).send('Invalid type');
         }
+    }
 
     } catch (error) {
         console.error('Error calling compute.1var.com:', error);
