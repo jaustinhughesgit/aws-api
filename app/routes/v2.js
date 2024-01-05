@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
-router.all('/*', async function(req, res, next) {
+router.get('/*', async function(req, res, next) {
     console.log("vsRouter2")
     console.log("req",req)
     try {
@@ -10,19 +10,10 @@ router.all('/*', async function(req, res, next) {
         res.header('Access-Control-Allow-Credentials', 'true');
         console.log("vsRouter3")
         const type = req.type; 
-        console.log("type", type)
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         const computeUrl = `https://compute.1var.com${reqPath}`;
-
-        const longText = "This is a very long text that I want to send to my API...";
-        const data = {
-            text: longText
-        };
-        console.log("computeUrl", computeUrl)
-        const response = await axios.get(computeUrl, { 
-            credentials: 'include'
-        });
+        const response = await axios.get(computeUrl, { withCredentials: true });
         if (type === "url") {
             res.json(response.data);
         } else if (type === "cookies") {
@@ -33,7 +24,6 @@ router.all('/*', async function(req, res, next) {
                     res.append('Set-Cookie', cookie);
                 });
             }
-            console.log("response",response)
             res.send(response.data);
         } else {
             res.status(400).send('Invalid type');
