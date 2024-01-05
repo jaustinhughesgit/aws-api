@@ -13,7 +13,20 @@ router.all('/*', async function(req, res, next) {
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         const computeUrl = `https://compute.1var.com${reqPath}`;
-        const response = await axios.post(computeUrl, { withCredentials: true });
+
+        const longText = "This is a very long text that I want to send to my API...";
+        const data = {
+            text: longText
+        };
+
+        const response = await axios.post(computeUrl, { 
+            credentials: 'include',
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json', 
+            },
+            body: JSON.stringify(data)
+        });
         if (type === "url") {
             res.json(response.data);
         } else if (type === "cookies") {
