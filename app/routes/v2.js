@@ -19,7 +19,7 @@ router.all('/*', async function(req, res, next) {
             text: longText
         };
 
-        const response = await axios.post(computeUrl, { 
+        const response = await axios.get(computeUrl, { 
             credentials: 'include'
         });
         if (type === "url") {
