@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
-router.get('/*', async function(req, res, next) {
+router.all('/*', async function(req, res, next) {
     console.log("vsRouter2")
     console.log("req",req)
     try {
