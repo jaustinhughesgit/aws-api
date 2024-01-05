@@ -21,7 +21,6 @@ router.all('/*', async function(req, res, next) {
 
         const response = await axios.post(computeUrl, { 
             credentials: 'include',
-            method: 'POST', 
             body: JSON.stringify(data)
         });
         if (type === "url") {
