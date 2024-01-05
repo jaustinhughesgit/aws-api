@@ -14,10 +14,12 @@ router.get('/*', async function(req, res, next) {
         const type = req.type; 
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
+        console.log("req.headers", req.headers)
+        const originalHost = req.headers['x-original-host'];
         const computeUrl = `https://compute.1var.com${reqPath}`;
         const response = await axios.get(computeUrl, { withCredentials: true,
             headers: {
-                'X-Original-Host': '1var.com'
+                'X-Original-Host': originalHost
             }
         });
         if (type === "url") {
