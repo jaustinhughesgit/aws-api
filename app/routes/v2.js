@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
+const bodyParser = require('body-parser');
 console.log("vsRouter1")
+router.use(bodyParser.json());
 router.all('/*', async function(req, res, next) {
     console.log("vsRouter2")
     console.log("req",req)
