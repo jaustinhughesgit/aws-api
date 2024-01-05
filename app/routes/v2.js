@@ -8,6 +8,7 @@ router.all('/*', async function(req, res, next) {
     try {
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
         console.log("vsRouter3")
         const type = req.type; 
         console.log("req.path ==> ",req.apiGateway.event.path)
