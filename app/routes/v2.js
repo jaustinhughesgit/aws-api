@@ -26,6 +26,7 @@ router.all('/*', async function(req, res, next) {
                 withCredentials: true,
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/1var',
                     'X-Original-Host': originalHost
                 },
                 body: requestBody
