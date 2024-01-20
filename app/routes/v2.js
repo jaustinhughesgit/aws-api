@@ -17,7 +17,7 @@ router.all('/*', async function(req, res, next) {
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         console.log("req.headers", req.headers)
-        const requestBody = req.body;
+        const requestBody = JSON.parse(req.body);
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
         if (req.method === 'GET' || req.method === 'POST') {
