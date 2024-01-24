@@ -3,12 +3,15 @@ var router = express.Router();
 const axios = require('axios');
 const bodyParser = require('body-parser');
 console.log("vsRouter1")
+
 router.use(bodyParser.json());
 router.all('/*', async function(req, res, next) {
 
     console.log("vsRouter2")
     console.log("req",req)
     try {
+        const accessToken = req.cookies['accessToken'];
+        console.log("accessToken", accessToken)
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
         res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
@@ -27,7 +30,8 @@ router.all('/*', async function(req, res, next) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Original-Host': originalHost
+                    'X-Original-Host': originalHost,
+                    'X-accessToken': accessToken
                 },
                 body: requestBody
             });
