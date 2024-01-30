@@ -26,15 +26,15 @@ app.all("/auth*", async function(req, res, next){
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
-    const reqPath = req.apiGateway.event.path
-    const reqBody = req.body;
-    const accessToken = req.cookies.accessToken;
     if (req.method === 'GET' || req.method === 'POST') {
+        const reqPath = req.apiGateway.event.path
+        const reqBody = req.body;
+        const accessToken = req.headers['x-accessToken'];
+        const originalHost = req.headers['x-original-host'];
+        const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("accessToken",accessToken)
-        const originalHost = req.headers['x-original-host'];
-        const computeUrl = `https://compute.1var.com${reqPath}`;
         const response = await axios.post(computeUrl, { 
             withCredentials: true,
             method: 'POST',
