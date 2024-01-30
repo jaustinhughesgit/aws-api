@@ -23,8 +23,10 @@ router.all('/*', async function(req, res, next) {
         const requestBody = req.body;
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
+        let splitOriginalHost = originalHost.split("1var.com")[1]
+        const computeUrl = `https://compute.1var.com${splitOriginalHost}`;
         if (req.method === 'GET' || req.method === 'POST') {
-            const computeUrl = `https://compute.1var.com${reqPath}`;
+            //const computeUrl = `https://compute.1var.com${reqPath}`;
             const response = await axios.post(computeUrl, { 
                 withCredentials: true,
                 method: 'POST',
