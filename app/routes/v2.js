@@ -10,7 +10,6 @@ router.all('/*', async function(req, res, next) {
     console.log("vsRouter2")
     console.log("req",req)
     try {
-        const accessToken = req.cookies['accessToken'];
         console.log("accessToken", accessToken)
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
@@ -23,6 +22,7 @@ router.all('/*', async function(req, res, next) {
         const requestBody = req.body;
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
+        const accessToken = req.headers['x-accessToken'];
         if (req.method === 'GET' || req.method === 'POST') {
             const computeUrl = `https://compute.1var.com${reqPath}`;
             const response = await axios.post(computeUrl, { 
