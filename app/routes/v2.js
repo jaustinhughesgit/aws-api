@@ -32,6 +32,8 @@ router.all('/*', async function(req, res, next) {
                 },
                 body: requestBody
             });
+            console.log("response",response)
+            console.log("response.headers",response.headers)
             if (type === "url") {
                 res.json(response.data);
             } else if (type === "cookies") {
