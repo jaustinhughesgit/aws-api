@@ -21,7 +21,7 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
     next('route'); // Pass control to the next route
 }, v2Router);
 
-app.get("/auth*", async function(req, res, next){
+app.all("/auth*", async function(req, res, next){
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
