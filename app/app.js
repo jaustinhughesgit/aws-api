@@ -15,19 +15,7 @@ var v2Router = require('./routes/v2');
 app.use('/', indexRouter);
 // Route for /cookies/* and /url/*
 app.use('/:type(cookies|url)*', function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', 'https://1var.com');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
-
     console.log("req",req)
-    const reqPath = req.apiGateway.event.path
-    const reqBody = req.body;
-    console.log(reqBody)
-    console.log("req.headers",req.headers)
-    const accessToken = req.body.headers['X-accessToken'];
-    const originalHost = req.body.headers['X-Original-Host'];
-    console.log("accessToken",accessToken)
-    console.log("originalHost",originalHost)
     console.log("req.params.type", req.params.type)
     req.type = req.params.type; // Capture the type (cookies or url)
     next('route'); // Pass control to the next route
