@@ -44,6 +44,7 @@ router.all('/*', async function(req, res, next) {
                         res.append('Set-Cookie', cookie);
                     });
                 }
+                console.log("response.data",response.data)
                 res.send(response.data);
             } else {
                 res.status(400).send('Invalid type');
