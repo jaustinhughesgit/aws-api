@@ -2,18 +2,26 @@ var express = require('express');
 var router = express.Router();
 const axios = require('axios');
 const bodyParser = require('body-parser');
+console.log("vsRouter1")
 
 router.use(bodyParser.json());
 router.all('/*', async function(req, res, next) {
+
+    console.log("vsRouter2")
+    console.log("req",req)
     try {
         const accessToken = req.cookies['accessToken'];
         console.log("accessToken", accessToken)
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
         res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
+        console.log("vsRouter3")
         const type = req.type; 
+        console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
+        console.log("req.headers", req.headers)
         const requestBody = req.body;
+        console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
         if (req.method === 'GET' || req.method === 'POST') {
             const computeUrl = `https://compute.1var.com${reqPath}`;
@@ -27,10 +35,11 @@ router.all('/*', async function(req, res, next) {
                 },
                 body: requestBody
             });
-            console.log("response",response)
+            console.log("response", response)
             if (type === "url") {
                 res.json(response.data);
             } else if (type === "cookies") {
+                console.log("set cookies")
                 const cookies = response.headers['set-cookie'];
                 if (cookies) {
                     cookies.forEach(cookie => {
