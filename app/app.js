@@ -26,6 +26,11 @@ app.all("/auth*", async function(req, res, next){
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
+
+    if (req.body.hasOwnProperty("headers")){
+        console.log("req.body.headers",req.body.headers);
+    }
+
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
         const reqBody = req.body;
