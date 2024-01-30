@@ -3,8 +3,6 @@ var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
 
-router.use(express.json());
-
 router.all('/*', async function(req, res, next) {
 
     console.log("vsRouter2")
