@@ -31,8 +31,8 @@ app.all("/auth*", async function(req, res, next){
         const reqPath = req.apiGateway.event.path
         const reqBody = req.body;
         console.log("req.headers",req.headers)
-        const accessToken = req.body.headers['x-accessToken'];
-        const originalHost = req.body.headers['x-original-host'];
+        const accessToken = req.body.headers['X-accessToken'];
+        const originalHost = req.body.headers['X-Original-Host'];
         const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
