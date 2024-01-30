@@ -27,16 +27,12 @@ app.all("/auth*", async function(req, res, next){
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
-    if (req.body.hasOwnProperty("headers")){
-        console.log("req.body.headers",req.body.headers);
-    }
-
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
         const reqBody = req.body;
         console.log("req.headers",req.headers)
-        const accessToken = req.headers['x-accessToken'];
-        const originalHost = req.headers['x-original-host'];
+        const accessToken = req.body.headers['x-accessToken'];
+        const originalHost = req.body.headers['x-original-host'];
         const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
