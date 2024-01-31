@@ -31,7 +31,7 @@ router.all('/*', async function(req, res, next) {
                     'X-Original-Host': originalHost,
                     'X-accessToken': accessToken
                 },
-                body: JSON.stringify(requestBody)
+                body: requestBody
             });
             console.log("response",response)
             console.log("response.headers",response.headers)
