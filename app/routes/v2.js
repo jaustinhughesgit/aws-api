@@ -17,6 +17,7 @@ router.all('/*', async function(req, res, next) {
         console.log("req.path ==> ",req.apiGateway.event.path)
         reqPath = req.apiGateway.event.path
         console.log("req.headers", req.headers)
+        console.log("req.apiGateway.event",req.apiGateway.event)
         const requestBody = req.body;
         console.log("requestBody",requestBody)
         const originalHost = req.headers['x-original-host'];
