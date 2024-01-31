@@ -46,7 +46,7 @@ app.all("/auth*", async function(req, res, next){
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
             },
-            body: reqBody
+            body: JSON.stringify(reqBody)
         });
         
         const cookies = response.headers['set-cookie'];
