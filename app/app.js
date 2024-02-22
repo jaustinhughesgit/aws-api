@@ -61,7 +61,7 @@ app.all("/auth*", async function(req, res, next){
         if (typeof response.data == "number"){
             resData = response.data.toString()
         }
-        res.send(resData+"-");
+        res.send(resData);
 
     } else {
         res.send("")
