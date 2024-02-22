@@ -55,7 +55,8 @@ app.all("/auth*", async function(req, res, next){
                 res.append('Set-Cookie', cookie);
             });
         }
-        
+        console.log("response.data", response.data);
+        console.log("typeof", typeof response.data)
         res.send(response.data);
 
     } else {
