@@ -57,7 +57,7 @@ app.all("/auth*", async function(req, res, next){
         }
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
-        let resData = resData = response.data
+        let resData = response.data
         if (typeof response.data == "number"){
             resData = response.data.toString()
         }
