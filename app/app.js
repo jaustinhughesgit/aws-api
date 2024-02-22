@@ -57,10 +57,9 @@ app.all("/auth*", async function(req, res, next){
         }
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
+        let resData = resData = response.data
         if (typeof response.data == "number"){
             resData = response.data.toString()
-        } else {
-            resData = response.data
         }
         res.send(resData);
 
