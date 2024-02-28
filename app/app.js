@@ -38,7 +38,12 @@ app.all("/auth*", async function(req, res, next){
         } catch {
             console.log("error accessToken")
         }
-        const originalHost = req.body.headers['X-Original-Host'];
+        const originalHost = "";
+        try{
+            originalHost = req.body.headers['X-Original-Host'];
+        } catch {
+            console.log("error original host")
+        }
         const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
