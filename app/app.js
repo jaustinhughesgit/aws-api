@@ -102,6 +102,7 @@ app.all("/blocks*", async function(req, res, next){
                 res.append('Set-Cookie', cookie);
             });
         }
+        console.log("response", response)
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
         let resData = response.data
