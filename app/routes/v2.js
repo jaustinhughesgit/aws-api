@@ -3,17 +3,17 @@ var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
 
-
 function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms, 'Timeout'));
+    return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 }
 
-
-
-async function someAsyncOperation(res, req, next){
+router.all('/*', async function(req, res, next) {
+    try {
+        const result = await Promise.race([
+            (async () => {
     console.log("vsRouter2")
     console.log("req",req)
-    try {
+
         const accessToken = req.cookies['accessToken'];
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
@@ -61,31 +61,18 @@ async function someAsyncOperation(res, req, next){
             res.send("")
         }
 
-    } catch (error) {
-        console.error('Error calling compute.1var.com:', error);
-        res.status(500).send('Server Error');
-    }
+        return "Result of async operation";
+    })(),
+    timeout(5000) // 5-second timeout
+]);
 
+} catch (error) {
+if (error.message === 'Timeout') {
+    res.status(408).send('Request Timeout');
+} else {
+    res.status(500).send('Internal Server Error');
 }
-
-
-router.all('/*', async function(req, res, next) {
-    const result = await Promise.race([
-        someAsyncOperation(),
-        timeout(90000) // Set timeout for 5000ms (5 seconds)
-    ]);
-
-    if (result === 'Timeout') {
-        // Handle timeout scenario
-        console.error('Operation timed out');
-    } else {
-        // Proceed with result
-        console.log('Operation completed', result);
-    }
-
-
-
-
+}
 
 });
 
