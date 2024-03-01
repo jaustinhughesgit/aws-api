@@ -22,7 +22,6 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
 }, v2Router);
 
 app.all("/auth*", async function(req, res, next){
-    req.setTimeout(600000);
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
