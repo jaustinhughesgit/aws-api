@@ -3,8 +3,14 @@ var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
 
-router.all('/*', async function(req, res, next) {
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms, 'Timeout'));
+}
+
+
+
+async function someAsyncOperation(res, req, next){
     console.log("vsRouter2")
     console.log("req",req)
     try {
@@ -59,6 +65,28 @@ router.all('/*', async function(req, res, next) {
         console.error('Error calling compute.1var.com:', error);
         res.status(500).send('Server Error');
     }
+
+}
+
+
+router.all('/*', async function(req, res, next) {
+    const result = await Promise.race([
+        someAsyncOperation(),
+        timeout(90000) // Set timeout for 5000ms (5 seconds)
+    ]);
+
+    if (result === 'Timeout') {
+        // Handle timeout scenario
+        console.error('Operation timed out');
+    } else {
+        // Proceed with result
+        console.log('Operation completed', result);
+    }
+
+
+
+
+
 });
 
 module.exports = router;

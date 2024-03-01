@@ -21,7 +21,12 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
     next('route'); // Pass control to the next route
 }, v2Router);
 
-app.all("/auth*", async function(req, res, next){
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms, 'Timeout'));
+}
+
+async function someAsyncOperation(res, req, next){
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -67,6 +72,25 @@ app.all("/auth*", async function(req, res, next){
     } else {
         res.send("")
     }
+}
+
+app.all("/auth*", async function(req, res, next){
+    const result = await Promise.race([
+        someAsyncOperation(),
+        timeout(9000) // Set timeout for 5000ms (5 seconds)
+    ]);
+
+    if (result === 'Timeout') {
+        // Handle timeout scenario
+        console.error('Operation timed out');
+    } else {
+        // Proceed with result
+        console.log('Operation completed', result);
+    }
+
+
+
+   
 })
 
 app.all("/blocks*", async function(req, res, next){
