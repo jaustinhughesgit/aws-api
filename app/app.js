@@ -21,10 +21,6 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
     next('route'); // Pass control to the next route
 }, v2Router);
 
-function timeout(ms) {
-    return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
-}
-
 app.all("/auth*", async function(req, res, next){
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
@@ -45,7 +41,6 @@ app.all("/auth*", async function(req, res, next){
         const response = await axios.post(computeUrl, { 
             withCredentials: true,
             method: 'POST',
-            timeout: 90000,
             headers: {
                 'Content-Type': 'application/json',
                 'X-Original-Host': originalHost,
