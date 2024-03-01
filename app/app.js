@@ -21,6 +21,25 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
     next('route'); // Pass control to the next route
 }, v2Router);
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms, 'Timeout'));
+}
+
+async function someAsyncOperation(computeUrl,originalHost, accessToken, reqBody){
+    const response = await axios.post(computeUrl, { 
+        withCredentials: true,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Original-Host': originalHost,
+            'X-accessToken': accessToken
+        },
+        body: reqBody
+    });
+    return response
+}
+
+
 app.all("/auth*", async function(req, res, next){
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
@@ -38,16 +57,12 @@ app.all("/auth*", async function(req, res, next){
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
         console.log("accessToken",accessToken)
-        const response = await axios.post(computeUrl, { 
-            withCredentials: true,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Original-Host': originalHost,
-                'X-accessToken': accessToken
-            },
-            body: reqBody
-        });
+        
+
+        const response = await Promise.race([
+            someAsyncOperation(computeUrl,originalHost, accessToken, reqBody),
+            timeout(90000) // Set timeout for 5000ms (5 seconds)
+        ]);
         
         const cookies = response.headers['set-cookie'];
         if (cookies) {
