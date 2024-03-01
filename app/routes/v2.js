@@ -3,17 +3,11 @@ var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
 
-function timeout(ms) {
-    return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
-}
-
 router.all('/*', async function(req, res, next) {
-    try {
-        const result = await Promise.race([
-            (async () => {
+
     console.log("vsRouter2")
     console.log("req",req)
-
+    try {
         const accessToken = req.cookies['accessToken'];
         res.header('Access-Control-Allow-Origin', 'https://1var.com');
         res.header('Access-Control-Allow-Credentials', 'true');
@@ -32,7 +26,6 @@ router.all('/*', async function(req, res, next) {
             const response = await axios.post(computeUrl, { 
                 withCredentials: true,
                 method: 'POST',
-                timeout: 90000,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Original-Host': originalHost,
@@ -61,19 +54,10 @@ router.all('/*', async function(req, res, next) {
             res.send("")
         }
 
-        return "Result of async operation";
-    })(),
-    timeout(90000) // 5-second timeout
-]);
-
-} catch (error) {
-if (error.message === 'Timeout') {
-    res.status(408).send('Request Timeout');
-} else {
-    res.status(500).send('Internal Server Error');
-}
-}
-
+    } catch (error) {
+        console.error('Error calling compute.1var.com:', error);
+        res.status(500).send('Server Error');
+    }
 });
 
 module.exports = router;

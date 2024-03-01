@@ -14,8 +14,8 @@ var indexRouter = require('./routes/index');
 var v2Router = require('./routes/v2');
 app.use('/', indexRouter);
 // Route for /cookies/* and /url/*
-app.use('/:type(cookies|url)*', function (req, res, next) {
-    console.log("req", req)
+app.use('/:type(cookies|url)*', function(req, res, next) {
+    console.log("req",req)
     console.log("req.params.type", req.params.type)
     req.type = req.params.type; // Capture the type (cookies or url)
     next('route'); // Pass control to the next route
@@ -25,73 +25,7 @@ function timeout(ms) {
     return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 }
 
-app.all("/auth*", async function (req, res, next) {
-    try {
-        const result = await Promise.race([
-            (async () => {
-                console.log("*****")
-                res.header('Access-Control-Allow-Origin', 'https://1var.com');
-                res.header('Access-Control-Allow-Credentials', 'true');
-                res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
-
-                if (req.method === 'GET' || req.method === 'POST') {
-                    const reqPath = req.apiGateway.event.path
-                    const reqBody = req.body.body;
-                    console.log("req.headers", req.headers)
-                    const accessToken = req.body.headers['X-accessToken'];
-                    const originalHost = req.body.headers['X-Original-Host'];
-                    const computeUrl = `https://compute.1var.com${reqPath}`;
-                    console.log("reqPath", reqPath)
-                    console.log("reqBody", reqBody)
-                    console.log("originalHost", originalHost)
-                    console.log("accessToken", accessToken)
-                    const response = await axios.post(computeUrl, {
-                        withCredentials: true,
-                        method: 'POST',
-                        timeout: 90000,
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Original-Host': originalHost,
-                            'X-accessToken': accessToken
-                        },
-                        body: reqBody
-                    });
-
-                    const cookies = response.headers['set-cookie'];
-                    if (cookies) {
-                        cookies.forEach(cookie => {
-                            res.append('Set-Cookie', cookie);
-                        });
-                    }
-                    console.log("response.data", response.data);
-                    console.log("typeof", typeof response.data)
-                    let resData = response.data
-                    if (typeof response.data == "number") {
-                        resData = response.data.toString()
-                    }
-                    res.send(resData);
-
-                } else {
-                    res.send("")
-                }
-
-                return "Result of async operation";
-            })(),
-            timeout(90000) // 5-second timeout
-        ]);
-
-    } catch (error) {
-        if (error.message === 'Timeout') {
-            res.status(408).send('Request Timeout');
-        } else {
-            res.status(500).send('Internal Server Error');
-        }
-    }
-
-
-})
-
-app.all("/blocks*", async function (req, res, next) {
+app.all("/auth*", async function(req, res, next){
     console.log("*****")
     res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -100,15 +34,63 @@ app.all("/blocks*", async function (req, res, next) {
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
         const reqBody = req.body.body;
-        console.log("req.headers", req.headers)
+        console.log("req.headers",req.headers)
+        const accessToken = req.body.headers['X-accessToken'];
+        const originalHost = req.body.headers['X-Original-Host'];
+        const computeUrl = `https://compute.1var.com${reqPath}`;
+        console.log("reqPath",reqPath)
+        console.log("reqBody",reqBody)
+        console.log("originalHost", originalHost)
+        console.log("accessToken",accessToken)
+        const response = await axios.post(computeUrl, { 
+            withCredentials: true,
+            method: 'POST',
+            timeout: 90000,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Original-Host': originalHost,
+                'X-accessToken': accessToken
+            },
+            body: reqBody
+        });
+        
+        const cookies = response.headers['set-cookie'];
+        if (cookies) {
+            cookies.forEach(cookie => {
+                res.append('Set-Cookie', cookie);
+            });
+        }
+        console.log("response.data", response.data);
+        console.log("typeof", typeof response.data)
+        let resData = response.data
+        if (typeof response.data == "number"){
+            resData = response.data.toString()
+        }
+        res.send(resData);
+
+    } else {
+        res.send("")
+    }
+})
+
+app.all("/blocks*", async function(req, res, next){
+    console.log("*****")
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
+
+    if (req.method === 'GET' || req.method === 'POST') {
+        const reqPath = req.apiGateway.event.path
+        const reqBody = req.body.body;
+        console.log("req.headers",req.headers)
         const accessToken = req.body.headers['X-accessToken'];
         const originalHost = req.body.headers['X-Original-Host'];
         const computeUrl = `https://compute.1var.com/${reqPath}`;
-        console.log("reqPath", reqPath)
-        console.log("reqBody", reqBody)
+        console.log("reqPath",reqPath)
+        console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
-        console.log("accessToken", accessToken)
-        const response = await axios.post(computeUrl, {
+        console.log("accessToken",accessToken)
+        const response = await axios.post(computeUrl, { 
             withCredentials: true,
             method: 'POST',
             headers: {
@@ -118,7 +100,7 @@ app.all("/blocks*", async function (req, res, next) {
             },
             body: reqBody
         });
-
+        
         const cookies = response.headers['set-cookie'];
         if (cookies) {
             cookies.forEach(cookie => {
@@ -129,7 +111,7 @@ app.all("/blocks*", async function (req, res, next) {
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
         let resData = response.data
-        if (typeof response.data == "number") {
+        if (typeof response.data == "number"){
             resData = response.data.toString()
         }
         res.send(resData);
