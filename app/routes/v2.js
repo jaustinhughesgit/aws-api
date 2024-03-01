@@ -63,7 +63,7 @@ router.all('/*', async function(req, res, next) {
 
         return "Result of async operation";
     })(),
-    timeout(5000) // 5-second timeout
+    timeout(90000) // 5-second timeout
 ]);
 
 } catch (error) {
