@@ -26,6 +26,7 @@ router.all('/*', async function(req, res, next) {
             const response = await axios.post(computeUrl, { 
                 withCredentials: true,
                 method: 'POST',
+                timeout: 90000,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Original-Host': originalHost,
