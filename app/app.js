@@ -48,7 +48,8 @@ app.all("/auth*", async function(req, res, next){
             },
             body: reqBody
         });
-        
+
+        console.log("response.data", response);
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
         console.log("response.status",response.status)
