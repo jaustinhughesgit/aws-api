@@ -23,7 +23,7 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
 
 app.all("/auth*", async function(req, res, next){
     console.log("*****")
-    res.header('Access-Control-Allow-Origin', 'https://domain.com');
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
@@ -33,7 +33,7 @@ app.all("/auth*", async function(req, res, next){
         console.log("req.headers",req.headers)
         const accessToken = req.body.headers['X-accessToken'];
         const originalHost = req.body.headers['X-Original-Host'];
-        const computeUrl = `https://sub.domain.com${reqPath}`;
+        const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
