@@ -53,7 +53,8 @@ app.all("/auth*", async function(req, res, next){
         console.log("response.data", response.data);
         console.log("typeof", typeof response.data)
         console.log("response.status",response.status)
-        console.log("response.data?.url",response.data?.url)
+        console.log("response.config.url",response.config.url)
+        console.log("response.request.res.responseUrl",response.request.res.responseUrl)
 
         if (response.status === 302 || response.data?.url) { // assuming your back-end sends a URL in response.data for redirects
             console.log("redirect")
