@@ -56,13 +56,13 @@ app.all("/auth*", async function(req, res, next){
         console.log("response.config.url",response.config.url)
         console.log("response.request.res.responseUrl",response.request.res.responseUrl)
 
-        if (!response.request.res.responseUrl.startsWith("https://compute.1var.com")) { // assuming your back-end sends a URL in response.data for redirects
+        /*if (!response.request.res.responseUrl.startsWith("https://compute.1var.com")) { // assuming your back-end sends a URL in response.data for redirects
             console.log("redirect")
             // If redirect, instruct the front-end to redirect
             const redirectUrl = response.headers.location || response.data.url; // Adjust based on your actual response structure
             res.status(302).header('Location', redirectUrl).send();
         } else {
-
+*/
             const cookies = response.headers['set-cookie'];
             if (cookies) {
                 cookies.forEach(cookie => {
@@ -74,7 +74,7 @@ app.all("/auth*", async function(req, res, next){
                 resData = response.data.toString()
             }
             res.send(resData);
-        }
+  //      }
 
     } else {
         res.send("")
