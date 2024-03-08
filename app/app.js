@@ -51,8 +51,8 @@ app.all("/auth*", async function(req, res, next){
     });
 
     // Check the content type of the response
-    const contentType = response.headers['content-type'];
-
+    const contentType = req.body.headers['content-type'];
+console.log("contentType", contentType)
     if (contentType === 'application/pdf') {
       // Set the headers for PDF response
       res.setHeader('Content-Type', 'application/pdf');
