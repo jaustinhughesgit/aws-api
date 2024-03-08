@@ -49,6 +49,22 @@ app.all("/auth*", async function(req, res, next){
             body: reqBody
         });
 
+        responseType: 'arraybuffer',
+    });
+
+    // Check the content type of the response
+    const contentType = response.headers['content-type'];
+
+    if (contentType === 'application/pdf') {
+      // Set the headers for PDF response
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
+    } else {
+      // Set the headers for other response types
+      res.setHeader('Content-Type', contentType);
+    }
+
+    
         console.log("response.data~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         console.log("response.data", response);
         console.log("response.data", response.data);
