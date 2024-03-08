@@ -47,16 +47,17 @@ app.all("/auth*", async function(req, res, next){
                 'X-accessToken': accessToken
             },
             body: reqBody,
-            responseType: 'arraybuffer',
+            responseType: 'arraybuffer'
     });
 
     // Check the content type of the response
-    const contentType = req.body.headers['content-type'];
+    const contentType = response.headers['content-type'];
 console.log("contentType", contentType)
     if (contentType === 'application/pdf') {
       // Set the headers for PDF response
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
+      res.send(response)
     } else {
       // Set the headers for other response types
       res.setHeader('Content-Type', contentType);
