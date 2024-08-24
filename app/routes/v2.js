@@ -5,7 +5,7 @@ console.log("vsRouter1")
 
 router.all('/*', async function(req, res, next) {
 
-    console.log("vsRouter2")
+    console.log("vsRouter2aaa")
     console.log("req",req)
     try {
         const accessToken = req.cookies['accessToken'];
