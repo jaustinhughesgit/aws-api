@@ -3,15 +3,25 @@ var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
 
+
+router.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://domain.com'); // Allow the origin making the request
+    res.header('Access-Control-Allow-Credentials', 'true'); // Allow cookies to be sent
+    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); // Allow HTTP methods
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host'); // Allow specific headers
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end(); // Return 200 for preflight requests
+    }
+    next();
+});
+
+
 router.all('/*', async function(req, res, next) {
 
     console.log("vsRouter2aaa")
     console.log("req",req)
     try {
         const accessToken = req.cookies['accessToken'];
-        res.header('Access-Control-Allow-Origin', 'https://1var.com');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
         console.log("vsRouter3")
         const type = req.type; 
         console.log("req.path ==> ",req.apiGateway.event.path)
