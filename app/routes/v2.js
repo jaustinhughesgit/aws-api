@@ -63,7 +63,7 @@ router.all('/*', async function(req, res, next) {
                 }
                 console.log("response.data",response.data)
                 if (typeof response.data === 'string') {
-                    res.send({"oai":{"html":response.data,"entity":accessToken}})
+                    res.send({"response":{"oai":{"html":response.data,"entity":accessToken}}})
                 }  else {
                     res.send(response.data);
                 }
