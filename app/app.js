@@ -21,15 +21,9 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
     next('route'); // Pass control to the next route
 }, v2Router);
 
-
-const allowedOrigins = ['https://1var.com', 'https://abc.api.1var.com'];
-
 app.all("/auth*", async function(req, res, next){
     console.log("*****")
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
@@ -105,10 +99,7 @@ console.log("contentType", contentType)
 
 app.all("/blocks*", async function(req, res, next){
     console.log("*****")
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
-    }
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
