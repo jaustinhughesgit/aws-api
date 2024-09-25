@@ -89,8 +89,10 @@ function getPathStartingWithABC(url) {
     // Split the pathname into segments
     const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
 
+    console.log("pathSegments", pathSegments)
     // Find and return the first path that starts with "abc"
     for (let segment of pathSegments) {
+        console.log("segment", segment)
         if (segment.startsWith("1v4r")) {
             return segment;
         }
