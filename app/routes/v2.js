@@ -63,7 +63,7 @@ router.all('/*', async function(req, res, next) {
                 }
                 console.log("response.data",response.data)
                 if (typeof response.data === 'string') {
-                    let ent = getPathStartingWithABC(computeUrl)
+                    let ent = getPathStartingWithABC(originalHost)
                     res.send({"response":{"oai":{"html":response.data,"entity":ent}}})
                 }  else {
                     res.send(response.data);
