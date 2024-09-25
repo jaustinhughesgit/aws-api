@@ -63,7 +63,8 @@ router.all('/*', async function(req, res, next) {
                 }
                 console.log("response.data",response.data)
                 if (typeof response.data === 'string') {
-                    res.send({"response":{"oai":{"html":response.data,"entity":accessToken}}})
+                    let ent = getPathStartingWithABC(computeUrl)
+                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}})
                 }  else {
                     res.send(response.data);
                 }
@@ -80,5 +81,23 @@ router.all('/*', async function(req, res, next) {
         res.status(500).send('Server Error');
     }
 });
+
+function getPathStartingWithABC(url) {
+    // Create a URL object from the given string to easily access the pathname
+    const parsedUrl = new URL(url);
+    
+    // Split the pathname into segments
+    const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
+
+    // Find and return the first path that starts with "abc"
+    for (let segment of pathSegments) {
+        if (segment.startsWith("1v4r")) {
+            return segment;
+        }
+    }
+
+    // If no path starts with "abc", return null or an appropriate message
+    return null;
+}
 
 module.exports = router;
