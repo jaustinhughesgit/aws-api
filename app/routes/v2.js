@@ -43,7 +43,7 @@ router.all('/*', async function(req, res, next) {
                 withCredentials: true,
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/pdf',
+                    'Content-Type': 'application/json',
                     'X-Original-Host': originalHost,
                     'X-accessToken': accessToken
                 },
