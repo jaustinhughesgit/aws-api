@@ -49,7 +49,7 @@ app.all("/auth*", async function(req, res, next){
                 'X-accessToken': accessToken
             },
             body: reqBody,
-            responseType: 'arraybuffer'
+            responseType: 'json'
     });
 
     // Check the content type of the response
