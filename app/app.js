@@ -105,6 +105,8 @@ app.all("/blocks*", async function(req, res, next){
 
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
+        console.log("req",req)
+        console.log("req.body",req.body)
         const reqBody = req.body.body;
         console.log("req.headers",req.headers)
         const accessToken = req.body.headers['X-accessToken'];
