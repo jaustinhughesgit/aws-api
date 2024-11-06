@@ -33,9 +33,11 @@ app.all("/auth*", async function(req, res, next){
         console.log("req",req)
         console.log("req.body",req.body)
         console.log("req.headers",req.headers)
+        const origPath = req.originalUrl
+        console.log("origPath", origPath)
         const accessToken = req.body.headers['X-accessToken'];
         const originalHost = req.body.headers['X-Original-Host'];
-        const computeUrl = `https://compute.1var.com${reqPath}`;
+        const computeUrl = `https://compute.1var.com${origPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
