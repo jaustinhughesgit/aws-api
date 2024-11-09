@@ -56,11 +56,12 @@ app.all("/auth*", async function(req, res, next){
 
     // Check the content type of the response
     const contentType = response.headers['content-type'];
-console.log("contentType", contentType)
+    console.log("contentType", contentType)
     if (contentType === 'application/pdf') {
       // Set the headers for PDF response
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
+      console.log("response", response)
       res.send(response)
     } else {
       // Set the headers for other response types
