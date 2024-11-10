@@ -50,8 +50,8 @@ app.all("/auth*", async function(req, res, next){
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
             },
-            body: reqBody,
-            responseType: 'json'
+            body: reqBody//,
+            //responseType: 'json'
     });
 
     // Check the content type of the response
