@@ -111,24 +111,23 @@ app.all("/blocks*", async function(req, res, next){
         const reqPath = req.apiGateway.event.path
         console.log("req",req)
         console.log("req.body",req.body)
-        const reqBody = req.body.body;
+        const reqBody = req.body;
         console.log("req.headers",req.headers)
-        const accessToken = req.body.headers['X-accessToken'];
-        const originalHost = req.body.headers['X-Original-Host'];
+        const accessToken = req.headers['X-accessToken'];
+        const originalHost = req.headers['X-Original-Host'];
         const computeUrl = `https://compute.1var.com/${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
         console.log("accessToken",accessToken)
-        const response = await axios.post(computeUrl, { 
+        const response = await axios.post(computeUrl, reqBody, { 
             withCredentials: true,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
-            },
-            body: reqBody
+            }
         });
         
         const cookies = response.headers['set-cookie'];

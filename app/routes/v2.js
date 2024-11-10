@@ -39,15 +39,14 @@ router.all('/*', async function(req, res, next) {
         const originalHost = req.headers['x-original-host'];
         if (req.method === 'GET' || req.method === 'POST') {
             const computeUrl = `https://compute.1var.com${reqPath}`;
-            const response = await axios.post(computeUrl, { 
+            const response = await axios.post(computeUrl, requestBody, { 
                 withCredentials: true,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Original-Host': originalHost,
                     'X-accessToken': accessToken
-                },
-                body: requestBody
+                }
             });
             console.log("response",response)
             console.log("response.headers",response.headers)
