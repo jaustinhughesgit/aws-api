@@ -42,17 +42,15 @@ app.all("/auth*", async function(req, res, next){
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
         console.log("accessToken",accessToken)
-        const response = await axios.post(computeUrl, { 
-            withCredentials: true,
-            method: 'POST',
+        const response = await axios.post(computeUrl, reqBody, { 
             headers: {
-                'Content-Type': 'application/pdf',
-                'X-Original-Host': originalHost,
-                'X-accessToken': accessToken
+              'Content-Type': 'application/pdf',
+              'X-Original-Host': originalHost,
+              'X-accessToken': accessToken
             },
-            body: reqBody,
-            responseType: 'arraybuffer'
-    });
+            withCredentials: true,
+            responseType: 'arraybuffer' // Ensure this is outside the data object
+          });;
 
     // Check the content type of the response
     const contentType = response.headers['content-type'];
