@@ -127,7 +127,8 @@ app.all("/blocks*", async function(req, res, next){
                 'Content-Type': 'application/json',
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
-            }
+            },
+            responseType: 'arraybuffer'
         });
         
         const cookies = response.headers['set-cookie'];

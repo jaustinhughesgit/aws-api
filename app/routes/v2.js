@@ -46,7 +46,8 @@ router.all('/*', async function(req, res, next) {
                     'Content-Type': 'application/json',
                     'X-Original-Host': originalHost,
                     'X-accessToken': accessToken
-                }
+                },
+                responseType: 'arraybuffer'
             });
             console.log("response",response)
             console.log("response.headers",response.headers)
