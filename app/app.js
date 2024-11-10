@@ -60,7 +60,7 @@ app.all("/auth*", async function(req, res, next){
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
       console.log("response", response.data)
-      const jsonObject = JSON.parse(response.data.toString('utf8'))
+      const jsonObject = response.data.toString('utf8')
       console.log("jsonObject", jsonObject)
       //res.send(response.data)
     } else {
