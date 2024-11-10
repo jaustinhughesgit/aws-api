@@ -90,7 +90,8 @@ app.all("/auth*", async function(req, res, next){
                     res.append('Set-Cookie', cookie);
                 });
             }
-            let resData = response.data
+            let resData = Buffer.from(response.data)
+            console.log("resData", resData)
             if (typeof response.data == "number"){
                 resData = response.data.toString()
             }
