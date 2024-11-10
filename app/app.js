@@ -124,7 +124,7 @@ app.all("/blocks*", async function(req, res, next){
             withCredentials: true,
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/pdf',
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
             },
