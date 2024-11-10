@@ -29,40 +29,35 @@ app.all("/auth*", async function(req, res, next){
 
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
-        const reqBody = req.body;
-        console.log("req",req)
-        console.log("req.body",req.body)
+        const reqBody = req.body.body;
         console.log("req.headers",req.headers)
-        const origPath = req.originalUrl
-        console.log("origPath", origPath)
-        const accessToken = req.headers['x-accesstoken'];
-        const originalHost = req.headers['x-original-host'];
-        const computeUrl = `https://compute.1var.com${origPath}`;
+        const accessToken = req.body.headers['X-accessToken'];
+        const originalHost = req.body.headers['X-Original-Host'];
+        const computeUrl = `https://compute.1var.com${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
         console.log("accessToken",accessToken)
-        const response = await axios.post(computeUrl, reqBody, { 
-            headers: {
-              'Content-Type': 'application/pdf',
-              'X-Original-Host': originalHost,
-              'X-accessToken': accessToken
-            },
+        const response = await axios.post(computeUrl, { 
             withCredentials: true,
-            responseType: 'arraybuffer' // Ensure this is outside the data object
-          });;
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Original-Host': originalHost,
+                'X-accessToken': accessToken
+            },
+            body: reqBody,
+            responseType: 'arraybuffer'
+    });
 
     // Check the content type of the response
     const contentType = response.headers['content-type'];
-    console.log("contentType", contentType)
+console.log("contentType", contentType)
     if (contentType === 'application/pdf') {
       // Set the headers for PDF response
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
-      console.log("response", response.data)
-      const jsonObject = response.data.toString('utf8')
-      console.log("jsonObject", jsonObject)
-      //res.send(response.data)
+      res.send(response)
     } else {
       // Set the headers for other response types
       res.setHeader('Content-Type', contentType);
@@ -90,8 +85,7 @@ app.all("/auth*", async function(req, res, next){
                     res.append('Set-Cookie', cookie);
                 });
             }
-            let resData = Buffer.from(response.data)
-            console.log("resData", resData)
+            let resData = response.data
             if (typeof response.data == "number"){
                 resData = response.data.toString()
             }
@@ -111,26 +105,24 @@ app.all("/blocks*", async function(req, res, next){
 
     if (req.method === 'GET' || req.method === 'POST') {
         const reqPath = req.apiGateway.event.path
-        console.log("req",req)
-        console.log("req.body",req.body)
-        const reqBody = req.body;
+        const reqBody = req.body.body;
         console.log("req.headers",req.headers)
-        const accessToken = req.headers['x-accesstoken'];
-        const originalHost = req.headers['x-original-host'];
+        const accessToken = req.body.headers['X-accessToken'];
+        const originalHost = req.body.headers['X-Original-Host'];
         const computeUrl = `https://compute.1var.com/${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
         console.log("originalHost", originalHost)
         console.log("accessToken",accessToken)
-        const response = await axios.post(computeUrl, reqBody, { 
+        const response = await axios.post(computeUrl, { 
             withCredentials: true,
             method: 'POST',
             headers: {
-                'Content-Type': 'application/pdf',
+                'Content-Type': 'application/json',
                 'X-Original-Host': originalHost,
                 'X-accessToken': accessToken
             },
-            responseType: 'arraybuffer'
+            body: reqBody
         });
         
         const cookies = response.headers['set-cookie'];
