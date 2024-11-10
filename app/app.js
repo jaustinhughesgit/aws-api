@@ -113,8 +113,8 @@ app.all("/blocks*", async function(req, res, next){
         console.log("req.body",req.body)
         const reqBody = req.body;
         console.log("req.headers",req.headers)
-        const accessToken = req.headers['X-accessToken'];
-        const originalHost = req.headers['X-Original-Host'];
+        const accessToken = req.headers['x-accesstoken'];
+        const originalHost = req.headers['x-original-host'];
         const computeUrl = `https://compute.1var.com/${reqPath}`;
         console.log("reqPath",reqPath)
         console.log("reqBody",reqBody)
