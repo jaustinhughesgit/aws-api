@@ -62,7 +62,7 @@ app.all("/auth*", async function(req, res, next){
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
       console.log("response", response.data)
-      res.send(response.data)
+      //res.send(response.data)
     } else {
       // Set the headers for other response types
       res.setHeader('Content-Type', contentType);
