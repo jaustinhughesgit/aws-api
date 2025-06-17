@@ -68,7 +68,8 @@ router.all('/*', async function(req, res, next) {
                 }  else {
                     console.log("tpyeof", typeof response.data)
                     if (typeof response.data == "object"){
-                        res.json(response.data)
+                        res.send({"response":{"oai":{"html":response.data,"entity":ent}}})
+                        //res.json(response.data)
                     } else {
                         res.send(response.data);
                     }
