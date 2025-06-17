@@ -69,6 +69,9 @@ router.all('/*', async function(req, res, next) {
                     console.log("tpyeof", typeof response.data)
                     if (typeof response.data == "object"){
                         let ent = getPathStartingWithABC(originalHost)
+                        console.log("originalHost",originalHost)
+                        console.log("ent", ent)
+                        console.log("response.data",response.data)
                         res.send({"response":{"oai":{"html":response.data,"entity":ent}}})
                         //res.json(response.data)
                     } else {
