@@ -23,7 +23,7 @@ app.use('/:type(cookies|url)*', function(req, res, next) {
 
 app.all("/auth*", async function(req, res, next){
     console.log("*****")
-    res.header('Access-Control-Allow-Origin', ["https://1var.com", "https://email.1var.com"]);
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
@@ -99,7 +99,7 @@ console.log("contentType", contentType)
 
 app.all("/blocks*", async function(req, res, next){
     console.log("*****")
-    res.header('Access-Control-Allow-Origin', ["https://1var.com", "https://email.1var.com"]);
+    res.header('Access-Control-Allow-Origin', 'https://1var.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host');
 
