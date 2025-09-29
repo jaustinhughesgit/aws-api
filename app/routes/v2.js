@@ -2,12 +2,11 @@ var express = require('express');
 var router = express.Router();
 const axios = require('axios');
 console.log("vsRouter1")
-const allowedOrigin = 'https://1var.com';
+const allowedOrigin = ["https://1var.com", "https://email.1var.com"];
 
 router.use((req, res, next) => {
     console.log("setting up origens")
-    res.header('Access-Control-Allow-Origin', 'https://1var.com');
-    res.header('Access-Control-Allow-Origin', 'https://email.1var.com');
+    res.header('Access-Control-Allow-Origin', allowedOrigin);
     res.header('Access-Control-Allow-Credentials', 'true'); // Allow cookies to be sent
     res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS'); // Allow HTTP methods
     res.header('Access-Control-Allow-Headers', 'Content-Type, X-Original-Host'); // Allow specific headers
