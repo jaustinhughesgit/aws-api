@@ -71,20 +71,32 @@ router.all('/*', async function(req, res, next) {
             console.log("response.headers", response.headers);
 
             if (type === "url") {
-  res.json(response.data);
-} else if (type === "cookies") {
-  console.log("set cookies");
-  const cookies = response.headers['set-cookie'];
-  if (cookies) {
-    cookies.forEach(cookie => {
-      res.append('Set-Cookie', cookie);
-    });
-  }
-  // Return upstream as-is (string or object). No wrapping.
-  res.send(response.data);
-} else {
-  res.status(400).send('Invalid type');
-}
+                res.json(response.data);
+            } else if (type === "cookies") {
+                console.log("set cookies");
+                const cookies = response.headers['set-cookie'];
+                if (cookies) {
+                    cookies.forEach(cookie => {
+                        res.append('Set-Cookie', cookie);
+                    });
+                }
+
+                console.log("response.data", response.data);
+                if (typeof response.data === 'string') {
+                    let ent = getPathStartingWithABC(originalHost);
+                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                } else if (typeof response.data === "object") {
+                    let ent = getPathStartingWithABC(originalHost);
+                    console.log("originalHost", originalHost);
+                    console.log("ent", ent);
+                    console.log("response.data", response.data);
+                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                } else {
+                    res.send(response.data);
+                }
+            } else {
+                res.status(400).send('Invalid type');
+            }
         } else {
             res.send("");
         }
