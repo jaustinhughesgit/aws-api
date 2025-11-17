@@ -1,72 +1,112 @@
-// router.js
-const express = require('express');
+var express = require('express');
+var router = express.Router();
 const axios = require('axios');
-const cookieParser = require('cookie-parser');
+console.log("vsRouter1");
 
-const router = express.Router();
+// Allowlist of origins
+const allowedOrigins = [
+    "https://1var.com",
+    "https://email.1var.com"
+];
 
-// ——— CORS ———
-const allowedOrigins = ["https://1var.com", "https://email.1var.com"];
+// ---------- CORS Middleware ----------
 router.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Access-Control-Allow-Credentials", "true");
-  }
-  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-  // include X-Forward-Path in allowed headers
-  res.header("Access-Control-Allow-Headers", "Content-Type, X-Forward-Path, X-accessToken");
-  res.header("Access-Control-Expose-Headers", "*");
-  if (req.method === "OPTIONS") return res.status(200).end();
-  next();
+    console.log("setting up origins");
+    const origin = req.headers.origin;
+
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header("Access-Control-Allow-Credentials", "true");
+    }
+
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
+
+    if (req.method === "OPTIONS") {
+        console.log("END (preflight handled)");
+        return res.status(200).end();
+    }
+
+    next();
 });
+// ------------------------------------
 
-router.use(cookieParser());
+router.all('/*', async function(req, res, next) {
+    console.log("vsRouter2aaa");
+    console.log("req", req);
 
-// Use raw body so non-JSON/binary can pass through unchanged
-router.use(express.raw({ type: '*/*', limit: '50mb' }));
+    try {
+        const accessToken = req.cookies['accessToken'];
 
-// hop-by-hop headers must not be forwarded
-const HOP = new Set(['connection','keep-alive','proxy-authenticate','proxy-authorization','te','trailer','transfer-encoding','upgrade']);
-const filterHeaders = (h) => {
-  const out = {};
-  for (const [k,v] of Object.entries(h || {})) if (!HOP.has(k.toLowerCase())) out[k] = v;
-  return out;
-};
+        const origin = req.headers.origin;
+        if (allowedOrigins.includes(origin)) {
+            res.header("Access-Control-Allow-Origin", origin);
+            res.header("Access-Control-Allow-Credentials", "true");
+        }
 
-router.all('*', async (req, res) => {
-  try {
-    const accessToken = req.cookies?.accessToken || req.headers['x-accesstoken'] || '';
-    // client tells us which path to call upstream, default to originalUrl
-    const forwardPath = req.headers['x-forward-path'] || req.originalUrl;
-    const computeUrl  = `https://compute.1var.com${forwardPath}`;
+        console.log("vsRouter3");
+        const type = req.type; 
+        console.log("req.path ==> ", req.apiGateway.event.path);
+        const reqPath = req.apiGateway.event.path;
+        console.log("req.headers", req.headers);
+        console.log("req.apiGateway.event", req.apiGateway.event);
+        const requestBody = req.body;
+        console.log("requestBody", requestBody);
+        const originalHost = req.headers['x-original-host'];
 
-    // copy request headers (minus hop-by-hop)
-    const hdrs = filterHeaders(req.headers);
-    hdrs.host = 'compute.1var.com';
-    hdrs['x-accesstoken'] = accessToken;
+        if (req.method === 'GET' || req.method === 'POST') {
+            const computeUrl = `https://compute.1var.com${reqPath}`;
+            const response = await axios.post(computeUrl, { 
+                withCredentials: true,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Original-Host': originalHost,
+                    'X-accessToken': accessToken
+                },
+                body: requestBody
+            });
 
-    const resp = await axios({
-      url: computeUrl,
-      method: req.method,
-      data: ['GET','HEAD'].includes(req.method) ? undefined : req.body, // raw buffer
-      headers: hdrs,
-      responseType: 'stream',
-      validateStatus: () => true,
-      maxRedirects: 0,
-      decompress: false,
+            console.log("response", response);
+            console.log("response.headers", response.headers);
+
+            if (type === "url") {
+  res.json(response.data);
+} else if (type === "cookies") {
+  console.log("set cookies");
+  const cookies = response.headers['set-cookie'];
+  if (cookies) {
+    cookies.forEach(cookie => {
+      res.append('Set-Cookie', cookie);
     });
-
-    // forward status + headers + body (stream)
-    res.status(resp.status);
-    for (const [k,v] of Object.entries(filterHeaders(resp.headers))) res.setHeader(k, v);
-    resp.data.pipe(res);
-  } catch (err) {
-    const status = err.response?.status ?? 502;
-    res.status(status);
-    if (err.response?.data?.pipe) err.response.data.pipe(res);
-    else res.send(err.response?.data ?? (err.message || 'Upstream error'));
   }
+  // Return upstream as-is (string or object). No wrapping.
+  res.send(response.data);
+} else {
+  res.status(400).send('Invalid type');
+}
+        } else {
+            res.send("");
+        }
+
+    } catch (error) {
+        console.error('Error calling compute.1var.com:', error);
+        res.status(500).send('Server Error');
+    }
 });
+
+function getPathStartingWithABC(url) {
+    const parsedUrl = new URL(url);
+    const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
+
+    console.log("pathSegments", pathSegments);
+    for (let segment of pathSegments) {
+        console.log("segment", segment);
+        if (segment.startsWith("1v4r")) {
+            return segment;
+        }
+    }
+    return null;
+}
 
 module.exports = router;
