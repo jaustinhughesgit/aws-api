@@ -1,111 +1,98 @@
-var express = require('express');
-var router = express.Router();
+// at top-level somewhere:
+const express = require('express');
 const axios = require('axios');
-console.log("vsRouter1");
+const cookieParser = require('cookie-parser');
 
-// Allowlist of origins
-const allowedOrigins = [
-    "https://1var.com",
-    "https://email.1var.com"
-];
+const router = express.Router();
 
-// ---------- CORS Middleware ----------
+// Make sure cookies are parsed before this router
+// app.use(cookieParser());
+
+// If you want true pass-through for binary/multipart bodies, prefer raw:
+router.use(express.raw({ type: '*/*', limit: '50mb' })); // adjust limit as needed
+
+// CORS (keep what you had; adding expose-headers helps the browser read custom headers)
+const allowedOrigins = ["https://1var.com", "https://email.1var.com"];
 router.use((req, res, next) => {
-    console.log("setting up origins");
-    const origin = req.headers.origin;
-
-    if (allowedOrigins.includes(origin)) {
-        res.header("Access-Control-Allow-Origin", origin);
-        res.header("Access-Control-Allow-Credentials", "true");
-    }
-
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
-
-    if (req.method === "OPTIONS") {
-        console.log("END (preflight handled)");
-        return res.status(200).end();
-    }
-
-    next();
-});
-// ------------------------------------
-
-router.all('/*', async function(req, res, next) {
-    console.log("vsRouter2aaa");
-    console.log("req", req);
-
-    try {
-        const accessToken = req.cookies['accessToken'];
-
-        const origin = req.headers.origin;
-        if (allowedOrigins.includes(origin)) {
-            res.header("Access-Control-Allow-Origin", origin);
-            res.header("Access-Control-Allow-Credentials", "true");
-        }
-
-        console.log("vsRouter3");
-        const type = req.type; 
-        console.log("req.path ==> ", req.apiGateway.event.path);
-        const reqPath = req.apiGateway.event.path;
-        console.log("req.headers", req.headers);
-        console.log("req.apiGateway.event", req.apiGateway.event);
-        const requestBody = req.body;
-        console.log("requestBody", requestBody);
-        const originalHost = req.headers['x-original-host'];
-
-        if (req.method === 'GET' || req.method === 'POST') {
-            const computeUrl = `https://compute.1var.com${reqPath}`;
-            const response = await axios.post(computeUrl, { 
-                withCredentials: true,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Original-Host': originalHost,
-                    'X-accessToken': accessToken
-                },
-                body: requestBody
-            });
-
-            console.log("response", response);
-            console.log("response.headers", response.headers);
-
-            if (type === "url") {
-                res.json(response.data);
-            } else if (type === "cookies") {
-                console.log("set cookies");
-                const cookies = response.headers['set-cookie'];
-                if (cookies) {
-                    cookies.forEach(cookie => {
-                        res.append('Set-Cookie', cookie);
-                    });
-                }
-                    res.send(response);
-            } else {
-                res.status(400).send('Invalid type');
-            }
-        } else {
-            res.send("");
-        }
-
-    } catch (error) {
-        console.error('Error calling compute.1var.com:', error);
-        res.status(500).send('Server Error');
-    }
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
+  res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
+  res.header("Access-Control-Expose-Headers", "*, Authorization"); // optional
+  if (req.method === "OPTIONS") return res.status(200).end();
+  next();
 });
 
-function getPathStartingWithABC(url) {
-    const parsedUrl = new URL(url);
-    const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
+// hop-by-hop headers must not be forwarded
+const HOP_BY_HOP = new Set([
+  'connection','keep-alive','proxy-authenticate','proxy-authorization',
+  'te','trailer','transfer-encoding','upgrade'
+]);
 
-    console.log("pathSegments", pathSegments);
-    for (let segment of pathSegments) {
-        console.log("segment", segment);
-        if (segment.startsWith("1v4r")) {
-            return segment;
-        }
-    }
-    return null;
+function filterHeaders(headers) {
+  const out = {};
+  for (const [k, v] of Object.entries(headers)) {
+    if (!HOP_BY_HOP.has(k.toLowerCase())) out[k] = v;
+  }
+  return out;
 }
+
+router.all('*', async (req, res) => {
+  try {
+    // Build compute URL with path+query intact
+    const computeUrl = `https://compute.1var.com${req.originalUrl}`;
+
+    // Pull what you need from the incoming request
+    const accessToken = req.cookies?.accessToken || req.headers['x-accesstoken'] || '';
+    const originalHost = req.headers['x-original-host'];
+
+    // Forward request as-is. Use stream to avoid buffering/transforming.
+    const resp = await axios({
+      url: computeUrl,
+      method: req.method,
+      // For GET/HEAD there is no body; for others we pass the raw buffer
+      data: ['GET', 'HEAD'].includes(req.method) ? undefined : req.body,
+      responseType: 'stream',
+      // pass through relevant headers; override host to compute domain
+      headers: {
+        ...filterHeaders(req.headers),
+        host: 'compute.1var.com',
+        'x-original-host': originalHost,
+        'x-accesstoken': accessToken,
+      },
+      // don't reject non-2xx; we want to pass status through
+      validateStatus: () => true,
+      withCredentials: true,
+      maxRedirects: 0,
+      decompress: false, // pass content-encoding as-is
+    });
+
+    // Forward status + headers (minus hop-by-hop)
+    res.status(resp.status);
+    for (const [k, v] of Object.entries(filterHeaders(resp.headers))) {
+      // Express expects array for multi-value headers like set-cookie
+      res.setHeader(k, v);
+    }
+
+    // Stream body directly to the client
+    resp.data.pipe(res);
+  } catch (err) {
+    // If the upstream failed before sending a response, return something sane
+    const status = err.response?.status ?? 502;
+    const headers = err.response?.headers ? filterHeaders(err.response.headers) : {};
+    const payload = err.response?.data ?? 'Upstream error';
+    for (const [k, v] of Object.entries(headers)) res.setHeader(k, v);
+    // If we got a buffer/stream, just send it; otherwise stringify a bit
+    if (payload && typeof payload.pipe === 'function') {
+      res.status(status);
+      payload.pipe(res);
+    } else {
+      res.status(status).send(payload);
+    }
+  }
+});
 
 module.exports = router;
