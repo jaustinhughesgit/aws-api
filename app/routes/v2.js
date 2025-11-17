@@ -84,13 +84,13 @@ router.all('/*', async function(req, res, next) {
                 console.log("response.data", response.data);
                 if (typeof response.data === 'string') {
                     let ent = getPathStartingWithABC(originalHost);
-                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                    res.send(response.data);
                 } else if (typeof response.data === "object") {
                     let ent = getPathStartingWithABC(originalHost);
                     console.log("originalHost", originalHost);
                     console.log("ent", ent);
                     console.log("response.data", response.data);
-                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                    res.send(response.data);
                 } else {
                     res.send(response.data);
                 }
