@@ -115,9 +115,38 @@ router.all('/*', async function(req, res, next) {
             ? computeData
             : { error: error?.message || 'Server Error' };
 
-        // Preserve the real compute status/body so the browser can show the useful error
-        // instead of hiding it behind a generic API-layer 500.
-        return res.status(status).send(payload);
+        let ent = null;
+        try {
+            const originalHost = req.headers['x-original-host'];
+            if (originalHost) ent = getPathStartingWithABC(originalHost);
+        } catch (_) {}
+
+        const errorEnvelope = {
+            ok: false,
+            status,
+            error: typeof payload === "object"
+                ? (payload.error || payload.message || "Compute Error")
+                : String(payload),
+            compute: payload
+        };
+
+        // IMPORTANT: /cookies clients expect the API proxy envelope:
+        // { response: { oai: { html, entity } } }
+        // Keep that shape even on compute errors so fileWorker can safely read
+        // json.response.oai.html instead of crashing on a raw error body.
+        if (req.type === "cookies") {
+            return res.status(200).send({
+                response: {
+                    oai: {
+                        html: errorEnvelope,
+                        entity: ent
+                    }
+                }
+            });
+        }
+
+        // Keep /url responses JSON-shaped and non-throwing for browser callers too.
+        return res.status(200).json(errorEnvelope);
     }
 });
 
