@@ -49,7 +49,7 @@ router.all('/*', async function(req, res, next) {
         applyCors(req, res);
 
         console.log("vsRouter3");
-        const type = req.type; 
+        const type = req.type;
         console.log("req.path ==> ", req.apiGateway.event.path);
         const reqPath = req.apiGateway.event.path;
         console.log("req.headers", req.headers);
@@ -60,7 +60,7 @@ router.all('/*', async function(req, res, next) {
 
         if (req.method === 'GET' || req.method === 'POST') {
             const computeUrl = `https://compute.1var.com${reqPath}`;
-            const response = await axios.post(computeUrl, { 
+            const response = await axios.post(computeUrl, {
                 withCredentials: true,
                 method: 'POST',
                 headers: {
@@ -109,44 +109,11 @@ router.all('/*', async function(req, res, next) {
         console.error('Error calling compute.1var.com:', error);
         applyCors(req, res);
 
-        const status = error?.response?.status || 500;
-        const computeData = error?.response?.data;
-        const payload = computeData !== undefined
-            ? computeData
-            : { error: error?.message || 'Server Error' };
-
-        let ent = null;
-        try {
-            const originalHost = req.headers['x-original-host'];
-            if (originalHost) ent = getPathStartingWithABC(originalHost);
-        } catch (_) {}
-
-        const errorEnvelope = {
-            ok: false,
-            status,
-            error: typeof payload === "object"
-                ? (payload.error || payload.message || "Compute Error")
-                : String(payload),
-            compute: payload
-        };
-
-        // IMPORTANT: /cookies clients expect the API proxy envelope:
-        // { response: { oai: { html, entity } } }
-        // Keep that shape even on compute errors so fileWorker can safely read
-        // json.response.oai.html instead of crashing on a raw error body.
-        if (req.type === "cookies") {
-            return res.status(200).send({
-                response: {
-                    oai: {
-                        html: errorEnvelope,
-                        entity: ent
-                    }
-                }
-            });
-        }
-
-        // Keep /url responses JSON-shaped and non-throwing for browser callers too.
-        return res.status(200).json(errorEnvelope);
+        // Keep the original API-layer behavior/contract:
+        // do not wrap compute errors in a new response shape.
+        // Many client modules depend on the /cookies success wrapper only being used
+        // for successful compute responses.
+        res.status(500).send('Server Error');
     }
 });
 
