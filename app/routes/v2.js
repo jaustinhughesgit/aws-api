@@ -9,22 +9,30 @@ const allowedOrigins = [
     "https://email.1var.com"
 ];
 
-// ---------- CORS Middleware ----------
-router.use((req, res, next) => {
-    console.log("setting up origins");
+function applyCors(req, res) {
     const origin = req.headers.origin;
 
     if (allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
         res.header("Access-Control-Allow-Credentials", "true");
+        res.header("Vary", "Origin");
     }
 
     res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, X-Original-Host, X-accessToken, X-AccessToken, X-access-token"
+    );
+}
+
+// ---------- CORS Middleware ----------
+router.use((req, res, next) => {
+    console.log("setting up origins");
+    applyCors(req, res);
 
     if (req.method === "OPTIONS") {
         console.log("END (preflight handled)");
-        return res.status(200).end();
+        return res.status(204).end();
     }
 
     next();
@@ -38,11 +46,7 @@ router.all('/*', async function(req, res, next) {
     try {
         const accessToken = req.cookies['accessToken'];
 
-        const origin = req.headers.origin;
-        if (allowedOrigins.includes(origin)) {
-            res.header("Access-Control-Allow-Origin", origin);
-            res.header("Access-Control-Allow-Credentials", "true");
-        }
+        applyCors(req, res);
 
         console.log("vsRouter3");
         const type = req.type; 
@@ -103,7 +107,17 @@ router.all('/*', async function(req, res, next) {
 
     } catch (error) {
         console.error('Error calling compute.1var.com:', error);
-        res.status(500).send('Server Error');
+        applyCors(req, res);
+
+        const status = error?.response?.status || 500;
+        const computeData = error?.response?.data;
+        const payload = computeData !== undefined
+            ? computeData
+            : { error: error?.message || 'Server Error' };
+
+        // Preserve the real compute status/body so the browser can show the useful error
+        // instead of hiding it behind a generic API-layer 500.
+        return res.status(status).send(payload);
     }
 });
 
