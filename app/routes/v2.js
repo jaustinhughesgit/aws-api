@@ -1,193 +1,124 @@
-const AWS = require('aws-sdk');
-const express = require('express');
-const serverless = require('serverless-http');
-const path = require('path');
-const app = express();
+var express = require('express');
+var router = express.Router();
 const axios = require('axios');
-const cookieParser = require('cookie-parser');
+console.log("vsRouter1");
 
-// ---------- CORS Middleware ----------
-// Keep this BEFORE express.json()/urlencoded(), so malformed JSON and
-// preflight failures still include CORS headers in the browser response.
+// Allowlist of origins
 const allowedOrigins = [
-  "https://1var.com",
-  "https://email.1var.com"
+    "https://1var.com",
+    "https://email.1var.com"
 ];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
+// ---------- CORS Middleware ----------
+router.use((req, res, next) => {
+    console.log("setting up origins");
+    const origin = req.headers.origin;
 
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Vary", "Origin");
-  }
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+        res.header("Access-Control-Allow-Credentials", "true");
+    }
 
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, X-Original-Host, X-accessToken, X-AccessToken, X-access-token, Authorization"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
+    if (req.method === "OPTIONS") {
+        console.log("END (preflight handled)");
+        return res.status(200).end();
+    }
 
-  next();
+    next();
 });
 // ------------------------------------
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+router.all('/*', async function(req, res, next) {
+    console.log("vsRouter2aaa");
+    console.log("req", req);
 
-// Give JSON parse failures a useful response while preserving the CORS headers
-// already set above.
-app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    return res.status(400).json({
-      error: 'Invalid JSON body',
-      detail: err.message
-    });
-  }
-  next(err);
-});
+    try {
+        const accessToken = req.cookies['accessToken'];
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(cookieParser());
-
-var indexRouter = require('./routes/index');
-var v2Router = require('./routes/v2');
-app.use('/', indexRouter);
-
-// Route for /cookies/* and /url/*
-app.use('/:type(cookies|url)*', function(req, res, next) {
-    console.log("req",req)
-    console.log("req.params.type", req.params.type)
-    req.type = req.params.type; // Capture the type (cookies or url)
-    next(); // Continue into v2Router
-}, v2Router);
-
-app.all("/auth*", async function(req, res, next){
-    console.log("*****");
-
-    if (req.method === 'GET' || req.method === 'POST') {
-        const reqPath = req.apiGateway.event.path;
-        const reqBody = req.body.body;
-        console.log("req.headers",req.headers);
-        const accessToken = req.body.headers['X-accessToken'];
-        const originalHost = req.body.headers['X-Original-Host'];
-        const computeUrl = `https://compute.1var.com${reqPath}`;
-        console.log("reqPath",reqPath);
-        console.log("reqBody",reqBody);
-        console.log("originalHost", originalHost);
-        console.log("accessToken",accessToken);
-
-        const response = await axios.post(computeUrl, { 
-            withCredentials: true,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Original-Host': originalHost,
-                'X-accessToken': accessToken
-            },
-            body: reqBody,
-            responseType: 'arraybuffer'
-        });
-
-        const contentType = response.headers['content-type'];
-        console.log("contentType", contentType);
-
-        if (contentType === 'application/pdf') {
-          res.setHeader('Content-Type', 'application/pdf');
-          res.setHeader('Content-Disposition', 'attachment; filename=document.pdf');
-          res.send(response);
-        } else {
-          res.setHeader('Content-Type', contentType);
+        const origin = req.headers.origin;
+        if (allowedOrigins.includes(origin)) {
+            res.header("Access-Control-Allow-Origin", origin);
+            res.header("Access-Control-Allow-Credentials", "true");
         }
 
-        console.log("response.data~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        console.log("response.data", response);
-        console.log("response.data", response.data);
-        console.log("typeof", typeof response.data);
-        console.log("response.status",response.status);
-        console.log("response.config.url",response.config.url);
-        console.log("response.request.res.responseUrl",response.request.res.responseUrl);
-
-        if (!response.request.res.responseUrl.startsWith("https://compute.1var.com") && 
-            !response.request.res.responseUrl.startsWith("https://abc.api.1var.com") && 
-            !response.request.res.responseUrl.startsWith("https://1var.com")) {
-            console.log("redirect");
-            const redirectUrl = response.request.res.responseUrl;
-            res.status(302).header('Location', redirectUrl).send();
-        } else {
-            const cookies = response.headers['set-cookie'];
-            if (cookies) {
-                cookies.forEach(cookie => {
-                    res.append('Set-Cookie', cookie);
-                });
-            }
-            let resData = response.data;
-            if (typeof response.data == "number"){
-                resData = response.data.toString();
-            }
-            res.send(resData);
-        }
-    } else {
-        res.send("");
-    }
-});
-
-app.all("/blocks*", async function(req, res, next){
-    console.log("*****");
-
-    if (req.method === 'GET' || req.method === 'POST') {
+        console.log("vsRouter3");
+        const type = req.type; 
+        console.log("req.path ==> ", req.apiGateway.event.path);
         const reqPath = req.apiGateway.event.path;
-        const reqBody = req.body.body;
-        console.log("req.headers",req.headers);
-        const accessToken = req.body.headers['X-accessToken'];
-        const originalHost = req.body.headers['X-Original-Host'];
-        const computeUrl = `https://compute.1var.com/${reqPath}`;
-        console.log("reqPath",reqPath);
-        console.log("reqBody",reqBody);
-        console.log("originalHost", originalHost);
-        console.log("accessToken",accessToken);
+        console.log("req.headers", req.headers);
+        console.log("req.apiGateway.event", req.apiGateway.event);
+        const requestBody = req.body;
+        console.log("requestBody", requestBody);
+        const originalHost = req.headers['x-original-host'];
 
-        const response = await axios.post(computeUrl, { 
-            withCredentials: true,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Original-Host': originalHost,
-                'X-accessToken': accessToken
-            },
-            body: reqBody
-        });
-        
-        const cookies = response.headers['set-cookie'];
-        if (cookies) {
-            cookies.forEach(cookie => {
-                res.append('Set-Cookie', cookie);
+        if (req.method === 'GET' || req.method === 'POST') {
+            const computeUrl = `https://compute.1var.com${reqPath}`;
+            const response = await axios.post(computeUrl, { 
+                withCredentials: true,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Original-Host': originalHost,
+                    'X-accessToken': accessToken
+                },
+                body: requestBody
             });
-        }
-        console.log("response", response);
-        console.log("response.data", response.data);
-        console.log("typeof", typeof response.data);
 
-        let resData = response.data;
-        if (typeof response.data == "number"){
-            resData = response.data.toString();
-        }
-        res.send(resData);
+            console.log("response", response);
+            console.log("response.headers", response.headers);
 
-    } else {
-        res.send("");
+            if (type === "url") {
+                res.json(response.data);
+            } else if (type === "cookies") {
+                console.log("set cookies");
+                const cookies = response.headers['set-cookie'];
+                if (cookies) {
+                    cookies.forEach(cookie => {
+                        res.append('Set-Cookie', cookie);
+                    });
+                }
+
+                console.log("response.data", response.data);
+                if (typeof response.data === 'string') {
+                    let ent = getPathStartingWithABC(originalHost);
+                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                } else if (typeof response.data === "object") {
+                    let ent = getPathStartingWithABC(originalHost);
+                    console.log("originalHost", originalHost);
+                    console.log("ent", ent);
+                    console.log("response.data", response.data);
+                    res.send({"response":{"oai":{"html":response.data,"entity":ent}}});
+                } else {
+                    res.send(response.data);
+                }
+            } else {
+                res.status(400).send('Invalid type');
+            }
+        } else {
+            res.send("");
+        }
+
+    } catch (error) {
+        console.error('Error calling compute.1var.com:', error);
+        res.status(500).send('Server Error');
     }
 });
 
-// Fallback route for other paths
-app.get('*', (req, res) => {
-    res.status(404).send('Page not found');
-});
+function getPathStartingWithABC(url) {
+    const parsedUrl = new URL(url);
+    const pathSegments = parsedUrl.pathname.split('/').filter(segment => segment.length > 0);
 
-module.exports.handler = serverless(app);
+    console.log("pathSegments", pathSegments);
+    for (let segment of pathSegments) {
+        console.log("segment", segment);
+        if (segment.startsWith("1v4r")) {
+            return segment;
+        }
+    }
+    return null;
+}
+
+module.exports = router;

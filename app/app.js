@@ -6,17 +6,9 @@ const app = express();
 const axios = require('axios');
 const cookieParser = require('cookie-parser');
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(cookieParser());
-
-var indexRouter = require('./routes/index');
-var v2Router = require('./routes/v2');
-app.use('/', indexRouter);
-
 // ---------- CORS Middleware ----------
+// Keep this BEFORE express.json()/urlencoded(), so malformed JSON and
+// preflight failures still include CORS headers in the browser response.
 const allowedOrigins = [
   "https://1var.com",
   "https://email.1var.com"
@@ -28,25 +20,52 @@ app.use((req, res, next) => {
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Vary", "Origin");
   }
 
-  res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, X-Original-Host, X-accessToken, X-AccessToken, X-access-token, Authorization"
+  );
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.status(204).end();
   }
 
   next();
 });
 // ------------------------------------
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Give JSON parse failures a useful response while preserving the CORS headers
+// already set above.
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      error: 'Invalid JSON body',
+      detail: err.message
+    });
+  }
+  next(err);
+});
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(cookieParser());
+
+var indexRouter = require('./routes/index');
+var v2Router = require('./routes/v2');
+app.use('/', indexRouter);
+
 // Route for /cookies/* and /url/*
 app.use('/:type(cookies|url)*', function(req, res, next) {
     console.log("req",req)
     console.log("req.params.type", req.params.type)
     req.type = req.params.type; // Capture the type (cookies or url)
-    next('route'); // Pass control to the next route
+    next(); // Continue into v2Router
 }, v2Router);
 
 app.all("/auth*", async function(req, res, next){
