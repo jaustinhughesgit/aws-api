@@ -9,30 +9,22 @@ const allowedOrigins = [
     "https://email.1var.com"
 ];
 
-function applyCors(req, res) {
+// ---------- CORS Middleware ----------
+router.use((req, res, next) => {
+    console.log("setting up origins");
     const origin = req.headers.origin;
 
     if (allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
         res.header("Access-Control-Allow-Credentials", "true");
-        res.header("Vary", "Origin");
     }
 
     res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Content-Type, X-Original-Host, X-accessToken, X-AccessToken, X-access-token"
-    );
-}
-
-// ---------- CORS Middleware ----------
-router.use((req, res, next) => {
-    console.log("setting up origins");
-    applyCors(req, res);
+    res.header("Access-Control-Allow-Headers", "Content-Type, X-Original-Host, X-accessToken");
 
     if (req.method === "OPTIONS") {
         console.log("END (preflight handled)");
-        return res.status(204).end();
+        return res.status(200).end();
     }
 
     next();
@@ -46,10 +38,14 @@ router.all('/*', async function(req, res, next) {
     try {
         const accessToken = req.cookies['accessToken'];
 
-        applyCors(req, res);
+        const origin = req.headers.origin;
+        if (allowedOrigins.includes(origin)) {
+            res.header("Access-Control-Allow-Origin", origin);
+            res.header("Access-Control-Allow-Credentials", "true");
+        }
 
         console.log("vsRouter3");
-        const type = req.type;
+        const type = req.type; 
         console.log("req.path ==> ", req.apiGateway.event.path);
         const reqPath = req.apiGateway.event.path;
         console.log("req.headers", req.headers);
@@ -60,7 +56,7 @@ router.all('/*', async function(req, res, next) {
 
         if (req.method === 'GET' || req.method === 'POST') {
             const computeUrl = `https://compute.1var.com${reqPath}`;
-            const response = await axios.post(computeUrl, {
+            const response = await axios.post(computeUrl, { 
                 withCredentials: true,
                 method: 'POST',
                 headers: {
@@ -107,12 +103,6 @@ router.all('/*', async function(req, res, next) {
 
     } catch (error) {
         console.error('Error calling compute.1var.com:', error);
-        applyCors(req, res);
-
-        // Keep the original API-layer behavior/contract:
-        // do not wrap compute errors in a new response shape.
-        // Many client modules depend on the /cookies success wrapper only being used
-        // for successful compute responses.
         res.status(500).send('Server Error');
     }
 });
