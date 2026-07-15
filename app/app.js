@@ -37,12 +37,26 @@ app.use((req, res, next) => {
 });
 // ------------------------------------
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const API_BODY_LIMIT = String(process.env.API_BODY_LIMIT || '10mb').trim() || '10mb';
 
-// Give JSON parse failures a useful response while preserving the CORS headers
+app.use(express.json({ limit: API_BODY_LIMIT }));
+app.use(express.urlencoded({
+  extended: true,
+  limit: API_BODY_LIMIT,
+  parameterLimit: 10000,
+}));
+
+// Give parser failures a useful response while preserving the CORS headers
 // already set above.
 app.use((err, req, res, next) => {
+  if (err?.type === 'entity.too.large' || Number(err?.status || err?.statusCode) === 413) {
+    return res.status(413).json({
+      error: 'Request body is too large',
+      limit: API_BODY_LIMIT,
+      detail: err?.message || 'Payload exceeded the API Lambda body-parser limit',
+    });
+  }
+
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return res.status(400).json({
       error: 'Invalid JSON body',
