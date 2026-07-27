@@ -15,5 +15,7 @@
     "path": "^0.12.7",
     "serverless-http": "^3.2.0"
   },
-  "scripts": {}
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
 }

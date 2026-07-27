@@ -8,7 +8,9 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 10
+    # The proxy aborts its Compute call at 24 seconds, leaving time to return
+    # a structured CORS-enabled response before API Gateway's 29-second limit.
+    Timeout: 28
 
     Tracing: Active
   Api:
