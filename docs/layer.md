@@ -15,6 +15,8 @@ It should remain a policy and transport layer rather than become a second implem
 - Compute upstream timeout and connectivity classification
 - Stable browser-facing response and error envelopes
 - Durable job submission/status transport when background contracts are centralized
+- Versioned entity-publication/acknowledgement and authorized graph-hydration transport
+- Protected-envelope/grant lifecycle transport without plaintext inspection
 
 ## Does not own
 
@@ -31,6 +33,8 @@ It should remain a policy and transport layer rather than become a second implem
 - Payload and status shapes must be versioned before incompatible changes.
 - Cookie and token forwarding must be scoped and must avoid diagnostic leakage.
 - Durable operations must separate submission, status, result, cancellation, and retry semantics.
+- Publication retries must preserve the browser's idempotency key and return authoritative server IDs/versions without response-shape ambiguity.
+- Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.
 
 ## Verification focus
 
@@ -40,4 +44,4 @@ It should remain a policy and transport layer rather than become a second implem
 - Cookie and status forwarding
 - Idempotent background submission and polling
 - No secret-bearing logs
-
+- Entity-publication retry/acknowledgement and recipient-envelope authorization failures without plaintext leakage

@@ -11,6 +11,7 @@ This repository is the controlled browser-to-compute boundary for the larger 1va
 - Retries and polling must be idempotent and must not duplicate entity creation, Path installation, ContextDB changes, or protected actions.
 - Validate original host, authentication, route, payload size, and allowed transport headers deliberately.
 - Do not turn upstream errors into ambiguous HTML or shape-changing responses.
+- Preserve idempotency and typed acknowledgements for entity publication; do not inspect or reinterpret graph semantics in the proxy.
+- Protected-envelope transport may carry ciphertext, salts, and key wraps, but never plaintext or private keys. Recipient identifiers in an envelope are not authorization.
 
 Update `docs/layer.md`, shared contracts, and architecture decisions when the proxy boundary changes.
-
