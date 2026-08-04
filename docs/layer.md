@@ -18,6 +18,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Versioned entity-publication/acknowledgement and authorized graph-hydration transport
 - Protected-envelope/grant lifecycle transport without plaintext inspection
 - Transparent forwarding of sanitized versioned model-usage metadata without cost recalculation
+- Transparent forwarding of the validated LLM template identifier without resolving model policy
 
 ## Does not own
 
@@ -37,6 +38,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Publication retries must preserve the browser's idempotency key and return authoritative server IDs/versions without response-shape ambiguity.
 - Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.
 - Model cost traces are opaque response metadata at this layer. The proxy must neither add prompt/output content nor convert estimates into authoritative billing claims.
+- `llmTemplateId` is opaque transport at this layer. The proxy does not translate it into a model name or reasoning setting; the model-owning service validates and resolves it.
 
 ## Verification focus
 
