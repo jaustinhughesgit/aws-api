@@ -17,6 +17,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Durable job submission/status transport when background contracts are centralized
 - Versioned entity-publication/acknowledgement and authorized graph-hydration transport
 - Protected-envelope/grant lifecycle transport without plaintext inspection
+- Transparent forwarding of sanitized versioned model-usage metadata without cost recalculation
 
 ## Does not own
 
@@ -35,6 +36,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Durable operations must separate submission, status, result, cancellation, and retry semantics.
 - Publication retries must preserve the browser's idempotency key and return authoritative server IDs/versions without response-shape ambiguity.
 - Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.
+- Model cost traces are opaque response metadata at this layer. The proxy must neither add prompt/output content nor convert estimates into authoritative billing claims.
 
 ## Verification focus
 
