@@ -38,6 +38,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - Proxy timeouts must identify an upstream timeout without implying that durable background work was cancelled.
 - Payload and status shapes must be versioned before incompatible changes.
 - Cookie and token forwarding must be scoped and must avoid diagnostic leakage.
+- Browser sessions prefer the `accessToken` cookie; non-browser clients may replay the same bearer value through the existing `X-accessToken` header. Both resolve to one Compute identity contract.
 - Durable operations must separate submission, status, result, cancellation, and retry semantics.
 - Publication retries must preserve the browser's idempotency key and return authoritative server IDs/versions without response-shape ambiguity.
 - Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.

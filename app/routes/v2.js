@@ -5,6 +5,7 @@ const {
     COMPUTE_PROXY_TIMEOUT_MS,
     isComputeTimeout
 } = require("../lib/computeProxyPolicy");
+const { getAccessToken } = require("../lib/accessTokenTransport");
 
 // Allowlist of origins
 const allowedOrigins = [
@@ -34,7 +35,7 @@ router.use((req, res, next) => {
 
 router.all('/*', async function(req, res, next) {
     try {
-        const accessToken = req.cookies['accessToken'];
+        const accessToken = getAccessToken(req);
 
         const origin = req.headers.origin;
         if (allowedOrigins.includes(origin)) {
