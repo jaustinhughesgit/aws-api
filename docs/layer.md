@@ -6,6 +6,8 @@ This repository exposes the browser-facing API boundary and proxies sanctioned t
 
 It should remain a policy and transport layer rather than become a second implementation of the platform runtime.
 
+The `testing` repository is an additional client of this same public boundary. It must not receive a privileged transport shortcut; its session cookies, action routing, response envelopes, timeouts, and authorization failures follow the same contract as the website.
+
 ## Owns
 
 - Browser-origin allowlisting and preflight behavior
@@ -19,6 +21,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Protected-envelope/grant lifecycle transport without plaintext inspection
 - Transparent forwarding of sanitized versioned model-usage metadata without cost recalculation
 - Transparent forwarding of the validated LLM template identifier without resolving model policy
+- Versioned transport of intent-jurisdiction decisions, capability contract/version references, fork lineage operations, and their idempotency keys without reinterpreting semantics
 
 ## Does not own
 
@@ -27,6 +30,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Provider protocol discovery or provider response mapping
 - Protected-asset plaintext
 - User-facing repair decisions
+- Fact-versus-capability classification or repair-versus-fork contract comparison
 
 ## Boundary requirements
 
@@ -39,6 +43,7 @@ It should remain a policy and transport layer rather than become a second implem
 - Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.
 - Model cost traces are opaque response metadata at this layer. The proxy must neither add prompt/output content nor convert estimates into authoritative billing claims.
 - `llmTemplateId` is opaque transport at this layer. The proxy does not translate it into a model name or reasoning setting; the model-owning service validates and resolves it.
+- Intent effect classes, routing reason codes, capability IDs, contract versions, and evolution outcomes are typed transport fields. The proxy validates their envelope shape and authorization context but does not promote a fact mutation into capability creation or reinterpret a repair as a fork.
 
 ## Verification focus
 
@@ -49,3 +54,5 @@ It should remain a policy and transport layer rather than become a second implem
 - Idempotent background submission and polling
 - No secret-bearing logs
 - Entity-publication retry/acknowledgement and recipient-envelope authorization failures without plaintext leakage
+- Stable forwarding of jurisdiction/evolution envelopes and idempotency across retry, background status, clarification, repair, fork, and result responses
+- Headless-client parity for original-host routing, session-cookie forwarding, response envelopes, and reset authorization failures
