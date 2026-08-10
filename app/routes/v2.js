@@ -3,7 +3,8 @@ var router = express.Router();
 const axios = require('axios');
 const {
     COMPUTE_PROXY_TIMEOUT_MS,
-    isComputeTimeout
+    isComputeTimeout,
+    isComputePayloadTooLarge
 } = require("../lib/computeProxyPolicy");
 const { getAccessToken } = require("../lib/accessTokenTransport");
 
@@ -101,6 +102,15 @@ router.all('/*', async function(req, res, next) {
                 error: {
                     code: "COMPUTE_TIMEOUT",
                     message: "Compute exceeded its bounded response window. The request can be retried safely."
+                }
+            });
+        }
+        if (isComputePayloadTooLarge(error)) {
+            return res.status(413).json({
+                ok: false,
+                error: {
+                    code: "PAYLOAD_TOO_LARGE",
+                    message: "Compute requires this request to be submitted in smaller batches."
                 }
             });
         }

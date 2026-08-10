@@ -17,8 +17,13 @@ function isComputeTimeout(error) {
     || /timeout/i.test(String(error?.message || ""));
 }
 
+function isComputePayloadTooLarge(error) {
+  return Number(error?.response?.status || 0) === 413;
+}
+
 module.exports = {
   COMPUTE_PROXY_TIMEOUT_MS,
   isComputeTimeout,
+  isComputePayloadTooLarge,
   boundedTimeout,
 };

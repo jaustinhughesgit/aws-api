@@ -36,6 +36,7 @@ The `testing` repository is an additional client of this same public boundary. I
 
 - CORS headers must be applied before parsing so failures are visible to the browser.
 - Proxy timeouts must identify an upstream timeout without implying that durable background work was cancelled.
+- An upstream HTTP 413 must remain a sanitized HTTP 413 with a stable payload-size code so clients can split an idempotent batch; it must not be collapsed into a generic 502.
 - Payload and status shapes must be versioned before incompatible changes.
 - Cookie and token forwarding must be scoped and must avoid diagnostic leakage.
 - Browser sessions prefer the `accessToken` cookie; non-browser clients may replay the same bearer value through the existing `X-accessToken` header. Both resolve to one Compute identity contract.
@@ -50,7 +51,7 @@ The `testing` repository is an additional client of this same public boundary. I
 
 - Preflight from allowed and disallowed origins
 - Invalid JSON and oversized payload responses with CORS
-- Compute timeout versus other upstream errors
+- Compute timeout, payload-size rejection, and other upstream errors
 - Cookie and status forwarding
 - Idempotent background submission and polling
 - No secret-bearing logs
