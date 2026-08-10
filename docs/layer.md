@@ -42,7 +42,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - Browser sessions prefer the `accessToken` cookie; non-browser clients may replay the same bearer value through the existing `X-accessToken` header. Both resolve to one Compute identity contract.
 - Durable operations must separate submission, status, result, cancellation, and retry semantics.
 - Publication retries must preserve the browser's idempotency key and return authoritative server IDs/versions without response-shape ambiguity.
-- Context graph v1 publish, exact-user lookup, and hydration actions are opaque authenticated proxy operations at this layer. The API forwards the original workspace path and session identity; it never derives participant audiences or rewrites graph semantics.
+- Context graph v1 publish, exact-user lookup, ordinary hydration, and exact-name public-profile hydration actions are opaque authenticated proxy operations at this layer. The API forwards the original workspace path and session identity; it never derives participant/public audiences, resolves the target identity, or rewrites graph semantics.
 - Recipient envelope routes must carry authenticated principal/device context; the API boundary must never infer access from recipient IDs inside encrypted payloads.
 - Model cost traces are opaque response metadata at this layer. The proxy must neither add prompt/output content nor convert estimates into authoritative billing claims.
 - `llmTemplateId` is opaque transport at this layer. The proxy does not translate it into a model name or reasoning setting; the model-owning service validates and resolves it.
