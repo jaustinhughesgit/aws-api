@@ -22,6 +22,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - Transparent forwarding of sanitized versioned model-usage metadata without cost recalculation
 - Transparent forwarding of the validated LLM template identifier without resolving model policy
 - Versioned transport of intent-jurisdiction decisions, capability contract/version references, fork lineage operations, and their idempotency keys without reinterpreting semantics
+- Opaque forwarding of execution-envelope v1 plane, target, effect, status, trace, and idempotency fields without applying effects at the proxy
 
 ## Does not own
 
@@ -47,6 +48,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - Model cost traces are opaque response metadata at this layer. The proxy must neither add prompt/output content nor convert estimates into authoritative billing claims.
 - `llmTemplateId` is opaque transport at this layer. The proxy does not translate it into a model name or reasoning setting; the model-owning service validates and resolves it.
 - Intent effect classes, routing reason codes, capability IDs, contract versions, and evolution outcomes are typed transport fields. The proxy validates their envelope shape and authorization context but does not promote a fact mutation into capability creation or reinterpret a repair as a fork.
+- Execution envelopes are opaque transport here. The proxy does not convert `requested` into `authorized`/`applied`, move an invocation between planes, inspect dynamic code, or infer entity authority from an effect target.
 
 ## Verification focus
 
