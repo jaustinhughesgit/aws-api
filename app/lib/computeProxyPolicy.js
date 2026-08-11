@@ -1,3 +1,7 @@
+/**
+ * Platform: Keeps upstream failures typed so clients can retry jobs or split Path batches safely.
+ * Technical: Bounds the Compute timeout and classifies Axios timeout and HTTP 413 responses without exposing upstream bodies.
+ */
 "use strict";
 
 function boundedTimeout(value, fallback = 24_000) {

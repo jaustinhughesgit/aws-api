@@ -1,3 +1,7 @@
+/**
+ * Platform: Transparently carries authenticated, versioned browser/test requests to Compute without interpreting their semantics.
+ * Technical: Catch-all Express proxy preserving original-host routing, CORS, access tokens, timeouts, 413s, cookies, and response status.
+ */
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
@@ -8,13 +12,11 @@ const {
 } = require("../lib/computeProxyPolicy");
 const { getAccessToken } = require("../lib/accessTokenTransport");
 
-// Allowlist of origins
 const allowedOrigins = [
     "https://1var.com",
     "https://email.1var.com"
 ];
 
-// ---------- CORS Middleware ----------
 router.use((req, res, next) => {
     const origin = req.headers.origin;
 
@@ -32,8 +34,6 @@ router.use((req, res, next) => {
 
     next();
 });
-// ------------------------------------
-
 router.all('/*', async function(req, res, next) {
     try {
         const accessToken = getAccessToken(req);

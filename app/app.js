@@ -1,3 +1,7 @@
+/**
+ * Platform: Provides the thin browser/testing boundary to Compute without reimplementing Paths, entities, or provider logic.
+ * Technical: Express/Lambda entry point for CORS, bounded body parsing, token/cookie transport, route mounting, and structured proxy errors.
+ */
 const AWS = require('aws-sdk');
 const express = require('express');
 const serverless = require('serverless-http');
@@ -6,7 +10,6 @@ const app = express();
 const axios = require('axios');
 const cookieParser = require('cookie-parser');
 
-// ---------- CORS Middleware ----------
 // Keep this BEFORE express.json()/urlencoded(), so malformed JSON and
 // preflight failures still include CORS headers in the browser response.
 const allowedOrigins = [
@@ -35,8 +38,6 @@ app.use((req, res, next) => {
 
   next();
 });
-// ------------------------------------
-
 const API_BODY_LIMIT = String(process.env.API_BODY_LIMIT || '10mb').trim() || '10mb';
 
 app.use(express.json({ limit: API_BODY_LIMIT }));
