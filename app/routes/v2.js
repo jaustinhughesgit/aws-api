@@ -8,7 +8,8 @@ const axios = require('axios');
 const {
     COMPUTE_PROXY_TIMEOUT_MS,
     isComputeTimeout,
-    isComputePayloadTooLarge
+    isComputePayloadTooLarge,
+    sanitizedComputeClientError
 } = require("../lib/computeProxyPolicy");
 const { getAccessToken } = require("../lib/accessTokenTransport");
 
@@ -113,6 +114,10 @@ router.all('/*', async function(req, res, next) {
                     message: "Compute requires this request to be submitted in smaller batches."
                 }
             });
+        }
+        const clientError = sanitizedComputeClientError(error);
+        if (clientError) {
+            return res.status(clientError.status).json(clientError.body);
         }
         res.status(502).json({
             ok: false,

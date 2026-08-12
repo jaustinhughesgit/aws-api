@@ -7,6 +7,7 @@ const {
   COMPUTE_PROXY_TIMEOUT_MS,
   isComputeTimeout,
   isComputePayloadTooLarge,
+  sanitizedComputeClientError,
   boundedTimeout,
 } = require("../lib/computeProxyPolicy");
 
@@ -20,6 +21,30 @@ test("Compute proxy timeout leaves headroom for a CORS-enabled API response", ()
   assert.equal(isComputeTimeout({ code: "ECONNRESET" }), false);
   assert.equal(isComputePayloadTooLarge({ response: { status: 413 } }), true);
   assert.equal(isComputePayloadTooLarge({ response: { status: 500 } }), false);
+  assert.deepEqual(sanitizedComputeClientError({
+    response: { status: 400, data: { ok: false, error: "Revision contract is invalid." } },
+  }), {
+    status: 400,
+    body: {
+      ok: false,
+      error: { code: "COMPUTE_REQUEST_REJECTED", message: "Revision contract is invalid." },
+    },
+  });
+  assert.deepEqual(sanitizedComputeClientError({
+    response: {
+      status: 409,
+      data: { ok: false, error: { code: "EDIT_CONFLICT", message: "Already editing." } },
+    },
+  }), {
+    status: 409,
+    body: { ok: false, error: { code: "EDIT_CONFLICT", message: "Already editing." } },
+  });
+  assert.equal(sanitizedComputeClientError({
+    response: { status: 500, data: { ok: false, error: "internal detail" } },
+  }), null);
+  assert.equal(sanitizedComputeClientError({
+    response: { status: 400, data: { error: "shape not explicitly public" } },
+  }), null);
 
   const source = fs.readFileSync(path.join(__dirname, "../routes/v2.js"), "utf8");
   assert.match(source, /timeout:\s*COMPUTE_PROXY_TIMEOUT_MS/);
@@ -27,5 +52,6 @@ test("Compute proxy timeout leaves headroom for a CORS-enabled API response", ()
   assert.match(source, /COMPUTE_TIMEOUT/);
   assert.match(source, /status\(413\)\.json/);
   assert.match(source, /PAYLOAD_TOO_LARGE/);
+  assert.match(source, /sanitizedComputeClientError/);
   assert.doesNotMatch(source, /console\.log\((?:["'](?:req|requestBody|response)|req\b|response\b)/);
 });

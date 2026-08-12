@@ -15,6 +15,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - Authentication/cookie/header transport at the public boundary
 - Original-host and route normalization
 - Compute upstream timeout and connectivity classification
+- Sanitized forwarding of intentional Compute 4xx application errors
 - Stable browser-facing response and error envelopes
 - Durable job submission/status transport when background contracts are centralized
 - Versioned entity-publication/acknowledgement and authorized graph-hydration transport
@@ -38,6 +39,7 @@ The `testing` repository is an additional client of this same public boundary. I
 - CORS headers must be applied before parsing so failures are visible to the browser.
 - Proxy timeouts must identify an upstream timeout without implying that durable background work was cancelled.
 - An upstream HTTP 413 must remain a sanitized HTTP 413 with a stable payload-size code so clients can split an idempotent batch; it must not be collapsed into a generic 502.
+- An intentional Compute `ok:false` 4xx response retains its status and bounded code/message; unrecognized shapes and upstream 5xx details remain a generic 502.
 - Payload and status shapes must be versioned before incompatible changes.
 - Cookie and token forwarding must be scoped and must avoid diagnostic leakage.
 - Browser sessions prefer the `accessToken` cookie; non-browser clients may replay the same bearer value through the existing `X-accessToken` header. Both resolve to one Compute identity contract.
